@@ -1,0 +1,60 @@
+# Foodvisor Exporter
+
+English · [Français](README.md)
+
+Foodvisor Exporter lets you export the diary data from your own Foodvisor account as JSON, CSV, and XLSX. This is an **unofficial, independent project with no affiliation to Foodvisor**. It uses a private API that may change or reject requests. Check [Foodvisor's terms of service](https://www.foodvisor.io/fr/terms-of-service/raw/) before using it.
+
+## Installation and launch
+
+Download and extract the repository, then install **Python 3.9 or newer with Tkinter**. The launchers check these requirements and show an error if they are missing; they do not install them.
+
+| System | File to open |
+| --- | --- |
+| Windows | `Foodvisor-exporter-windows.cmd` |
+| macOS | `Foodvisor-exporter-macos.command` |
+| Linux | `Foodvisor-exporter-linux.sh` |
+
+If your file manager does not run the Linux launcher, open a terminal in the project directory and run `bash Foodvisor-exporter-linux.sh`. On macOS, the `.command` file opens in Terminal. You can also start the interface directly with `python3 app/interface.py` (or `py -3 app\interface.py` on Windows).
+
+On some Linux distributions, Tkinter is installed separately, often through the `python3-tk` package. The application needs no other Python library. To enable the optional system credential store, install `keyring` with `python3 -m pip install keyring` (or `py -3 -m pip install keyring` on Windows). A compatible system credential store must also be available; otherwise, you can still sign in manually. The archives built by the GitHub Actions workflow include `keyring`.
+
+## Using the graphical interface
+
+1. Choose the interface language under **Window → Interface language**. This setting does not change the language of exported data.
+2. Enter the email address and password for your personal Foodvisor account. The country and data language (`fr` or `en`) have initial values that you can change if needed. The data language determines the responses requested from Foodvisor and the CSV/XLSX labels.
+3. Click **Log in**. The window waits for Foodvisor's response and enables the date range and export only after it receives an access token. If the response contains your account preferences, it automatically fills in the country and supported language. Before logging in, you can select **Remember password in the system credential store**; this option is disabled if no compatible credential store is available.
+4. Choose the date range in **DD-MM-YYYY** format or with the calendar, select a destination directory, and start the export. The window shows progress and errors. **Cancel** stops processing between requests; a request already in progress can take up to 30 seconds.
+
+The “Country” field suggests the two-letter ISO codes `BE`, `FR`, `CH`, `LU`, `CA`, `US`, `GB`, `DE`, `ES`, and `IT`. These are suggestions, not a list of countries officially confirmed by Foodvisor. The selected code is used in the API URL; the service may still reject a valid ISO code.
+
+Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `donnees-brutes/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
+
+**Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
+
+The interface language and, after a login attempt, the email address are saved locally. The token is never written to disk. The password is saved only if you explicitly enable the system credential store. To log in, the application sends your password directly to Foodvisor over HTTPS. It does not send your credentials to the project creator.
+
+## Command line
+
+To export without the graphical interface:
+
+```bash
+bash Foodvisor-exporter.sh --start 2026-01-01 --end 2026-01-31
+```
+
+In the terminal, dates use **YYYY-MM-DD** format. `--start` is required for a download; `--end` defaults to today. Both dates are inclusive. The country (`--country`) and data language (`--locale`) default to `BE` and `fr`, respectively. `--locale en` requests data in English and produces English CSV/XLSX labels. The program prompts for credentials in the terminal, then creates the files under `exports/<timestamp>/`.
+
+To convert previously downloaded responses again, without connecting:
+
+```bash
+bash Foodvisor-exporter.sh --source exports/<timestamp>/donnees-brutes
+```
+
+A normal command exits after one export. To run several exports in the same terminal and reuse the session, run `bash Foodvisor-exporter.sh --interactive`. Enter a date range in **YYYY-MM-DD** format for each export, then leave the start date blank to quit. The password is requested again only if the session is no longer valid. It is not stored on disk.
+
+## Limitations
+
+The exporter reads the authenticated account's diary and the food records referenced by that diary. It does not browse the general catalog, change the account, or perform synchronization. Requests run sequentially with a one-second pause between them; this does not guarantee that Foodvisor will accept them.
+
+The API may change, and results may be incomplete if the diary has not synchronized. Meal and food names come from Foodvisor and are not translated locally. The tool does not refresh tokens, download images, or schedule automatic exports. Check the output files before relying on them.
+
+The repository contains no APK, decompiled code, secrets extracted from the application, or account data. To request your data through official channels, see [Foodvisor's privacy policy](https://www.foodvisor.io/fr/privacy-policy/raw/).
