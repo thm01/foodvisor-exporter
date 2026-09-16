@@ -1,5 +1,7 @@
 # Foodvisor Exporter
 
+[English](README.en.md) · Français
+
 Foodvisor Exporter permet d'exporter les données du journal de son propre compte Foodvisor en JSON, CSV et XLSX. Le projet est **non officiel, indépendant et non affilié à Foodvisor**. Il utilise une API privée qui peut changer ou refuser ses requêtes ; vérifiez les [conditions d'utilisation de Foodvisor](https://www.foodvisor.io/fr/terms-of-service/raw/) avant de l'utiliser.
 
 ## Installation et lancement
