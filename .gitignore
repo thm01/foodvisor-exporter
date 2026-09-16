@@ -1,0 +1,27 @@
+# Données de compte et résultats locaux
+/donnees/
+/exports/
+*.csv
+*.xlsx
+*.json
+!translations.json
+
+# Copie et analyse de l'application
+/analyse-apk/
+/depot-public/
+/docs/
+/tests/
+/.local-tk/
+/Voir-interface-locale.sh
+*.apk
+*.dex
+*.arsc
+
+# Fichiers Python et éditeur
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+.idea/
+.vscode/
