@@ -290,7 +290,7 @@ class Application(tk.Tk):
         self.clear_button.pack(side='left')
 
     def build_menu(self):
-        self.menu_bar = tk.Menu(self)
+        self.menu_bar = tk.Menu(self, tearoff=False)
         self.file_menu = tk.Menu(self.menu_bar, tearoff=False)
         self.file_menu.add_command(command=self.start_export, state='disabled')
         self.file_menu.add_command(command=self.start_offline)
