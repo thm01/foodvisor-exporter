@@ -1,6 +1,6 @@
 (() => {
   const $ = id => document.getElementById(id);
-  let csrf, catalog, state, stopped = false, folderTarget = null;
+  let csrf, catalog, state, stopped = false, folderTarget = null, refreshTimer;
   let previousConnected = false;
   let countryCodes = [], countryLanguage = null;
 
@@ -115,9 +115,14 @@
     notice('');
     try {
       render(await request(path, payload));
+      scheduleRefresh();
     } catch (error) {
       notice(error.message);
     }
+  }
+  function scheduleRefresh() {
+    clearTimeout(refreshTimer);
+    if (!stopped) refreshTimer = setTimeout(refresh, state?.busy || state?.authenticating ? 1000 : 30000);
   }
   async function refresh() {
     if (stopped) return;
@@ -127,6 +132,7 @@
       notice(t('server_stopped'));
       stopped = true;
     }
+    scheduleRefresh();
   }
   function isoFromText(value) {
     const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value.trim());
@@ -146,7 +152,7 @@
     }
   }
   async function settings(payload) {
-    try { render(await request('/api/settings', payload)); }
+    try { render(await request('/api/settings', payload)); scheduleRefresh(); }
     catch (error) { notice(error.message); }
   }
   async function showFolder(target) {
@@ -178,7 +184,11 @@
       catalog = bootstrap.ui;
       countryCodes = bootstrap.countries;
       render(await request('/api/state', null, 'GET'), true);
-      setInterval(refresh, 700);
+      scheduleRefresh();
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) scheduleRefresh();
+        else { clearTimeout(refreshTimer); refresh(); }
+      });
     } catch (_) { notice('Local application unavailable. / Application locale indisponible.'); return; }
     $('language').onchange = () => settings({language: $('language').value});
     $('email').onchange = () => settings({email: $('email').value});
