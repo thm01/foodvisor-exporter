@@ -73,6 +73,8 @@ Pour reconvertir des réponses existantes, utilisez `bash Foodvisor-exporter.sh 
 
 ## Limites
 
+L’application a été développée et testée avec un compte Foodvisor Premium. Les comptes gratuits n’ont pas été testés : leur compatibilité et la disponibilité de toutes les données ne sont pas garanties.
+
 L’exporteur lit uniquement le journal du compte connecté et les fiches alimentaires qu’il référence. Il ne parcourt pas le catalogue général, ne modifie pas le compte et ne synchronise pas les données du téléphone. Les activités saisies manuellement sont exportées lorsqu’elles figurent dans le journal reçu ; celles issues de Santé Connect ou d’Apple Santé peuvent manquer.
 
 Les kcal dépensées par jour sont la somme des `calories_burned` des activités reçues ; elles peuvent différer du bilan affiché par Foodvisor. Les cellules vides représentent des valeurs absentes, pas nécessairement zéro. L’API peut changer et les résultats peuvent être incomplets. Les requêtes sont séquentielles et espacées d’une seconde, sans garantie d’acceptation par Foodvisor. L’outil ne renouvelle pas les jetons, ne télécharge pas d’images et ne programme pas d’export automatique. Vérifiez les données avant de vous y fier.

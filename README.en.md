@@ -73,6 +73,8 @@ To convert existing responses, use `bash Foodvisor-exporter.sh --source exports/
 
 ## Limitations
 
+The application was developed and tested with a Foodvisor Premium account. Free accounts have not been tested, so compatibility and availability of all data are not guaranteed.
+
 The exporter reads only the logged-in account’s diary and the food records it references. It does not browse the general catalog, change the account, or synchronize phone data. Manually entered activities are exported when present in the received diary; activities from Health Connect or Apple Health may be missing.
 
 Daily burned kcal are the sum of `calories_burned` from received activities; they may differ from the balance shown by Foodvisor. Blank cells mean missing values, not necessarily zero. The API can change, and results may be incomplete. Requests are sequential with a one-second pause, which does not guarantee acceptance by Foodvisor. The tool does not refresh tokens, download images, or schedule exports. Check the data before relying on it.
