@@ -2,7 +2,7 @@
   const $ = id => document.getElementById(id);
   let csrf, catalog, state, stopped = false, folderTarget = null;
   let previousConnected = false;
-  const fields = ['email', 'password', 'country', 'data-locale', 'destination', 'start', 'end', 'source'];
+  let countryCodes = [], countryLanguage = null;
 
   function t(key) {
     return catalog?.[state?.language || 'fr']?.[key] || key;
@@ -11,11 +11,44 @@
     $('notice').textContent = message || '';
     $('notice').hidden = !message;
   }
+  function countryValue() {
+    return $('country-choice').value === '__other__'
+      ? $('country').value.trim().toUpperCase() : $('country-choice').value;
+  }
+  function setCountry(value) {
+    const country = (value || '').toUpperCase();
+    $('country-choice').value = countryCodes.includes(country) ? country : country ? '__other__' : '';
+    $('country').hidden = $('country-choice').value !== '__other__';
+    $('country').value = $('country').hidden ? '' : country;
+  }
+  function renderCountryChoices() {
+    if (countryLanguage === state.language) return;
+    const previous = countryValue();
+    const wasOther = $('country-choice').value === '__other__';
+    countryLanguage = state.language;
+    const names = catalog[state.language].country_names;
+    const items = [['', t('country_choose')],
+      ...countryCodes.map(code => [code, `${names[code]} (${code})`]),
+      ['__other__', t('country_other')]];
+    $('country-choice').replaceChildren(...items.map(([value, label]) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = label;
+      return option;
+    }));
+    setCountry(previous);
+    if (wasOther && !previous) {
+      $('country-choice').value = '__other__';
+      $('country').hidden = false;
+    }
+  }
   function translate() {
     document.documentElement.lang = state.language;
     document.title = t('title');
     document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = t(node.dataset.i18n); });
     $('remember-label').textContent = t(state.keyring_available ? 'remember_password' : 'remember_unavailable');
+    $('country').placeholder = t('country_custom');
+    $('country').setAttribute('aria-label', t('country_custom'));
     $('start-picker').setAttribute('aria-label', t('start'));
     $('end-picker').setAttribute('aria-label', t('end'));
   }
@@ -23,18 +56,19 @@
     const wasConnected = previousConnected;
     state = next;
     previousConnected = state.connected;
+    renderCountryChoices();
     if (initial) {
       $('language').value = state.language;
       $('email').value = state.email;
       $('remember').checked = state.remember;
-      $('country').value = state.country;
+      setCountry(state.country);
       $('data-locale').value = state.data_locale;
       $('destination').value = state.destination;
       $('start').value = state.start;
       $('end').value = state.end;
       syncPicker('start'); syncPicker('end');
     } else if (!wasConnected && state.connected) {
-      $('country').value = state.country;
+      setCountry(state.country);
       $('data-locale').value = state.data_locale;
       $('password').value = '';
     }
@@ -52,7 +86,7 @@
     $('password').disabled = busy || state.connected;
     $('remember').disabled = busy || state.connected || !state.keyring_available;
     ['start', 'end', 'start-picker', 'end-picker'].forEach(id => { $(id).disabled = busy || !state.connected; });
-    ['country', 'data-locale', 'destination', 'source'].forEach(id => { $(id).disabled = busy; });
+    ['country-choice', 'country', 'data-locale', 'destination', 'source'].forEach(id => { $(id).disabled = busy; });
     $('browse-destination').disabled = busy;
     $('browse-source').disabled = busy;
     $('export').disabled = busy || !state.connected;
@@ -67,6 +101,7 @@
   }
   async function request(path, payload, method = 'POST') {
     const options = {method, cache: 'no-store'};
+    if (method === 'GET' && csrf) options.headers = {'X-CSRF-Token': csrf};
     if (method === 'POST') {
       options.headers = {'Content-Type': 'application/json', 'X-CSRF-Token': csrf};
       options.body = JSON.stringify(payload || {});
@@ -141,7 +176,7 @@
       const bootstrap = await request('/api/i18n', null, 'GET');
       csrf = bootstrap.csrf;
       catalog = bootstrap.ui;
-      bootstrap.countries.forEach(code => { const option = document.createElement('option'); option.value = code; $('countries').append(option); });
+      countryCodes = bootstrap.countries;
       render(await request('/api/state', null, 'GET'), true);
       setInterval(refresh, 700);
     } catch (_) { notice('Local application unavailable. / Application locale indisponible.'); return; }
@@ -151,14 +186,23 @@
       if ($('remember').checked) settings({remember: true});
       else action('/api/forget');
     };
-    $('country').onchange = () => settings({country: $('country').value, data_locale: $('data-locale').value});
-    $('data-locale').onchange = () => settings({country: $('country').value, data_locale: $('data-locale').value});
+    $('country-choice').onchange = () => {
+      const choice = $('country-choice').value;
+      $('country').hidden = choice !== '__other__';
+      if (choice === '__other__') {
+        $('country').value = '';
+        $('country').focus();
+      }
+      else settings({country: choice});
+    };
+    $('country').onchange = () => settings({country: countryValue()});
+    $('data-locale').onchange = () => settings({data_locale: $('data-locale').value});
     $('destination').onchange = () => settings({destination: $('destination').value});
     $('login').onclick = async () => {
       const password = $('password').value;
       $('password').value = '';
       await action('/api/login', {email: $('email').value, password, remember: $('remember').checked,
-                                  country: $('country').value, data_locale: $('data-locale').value});
+                                  country: countryValue(), data_locale: $('data-locale').value});
     };
     $('logout').onclick = () => action('/api/logout');
     $('forget').onclick = () => action('/api/forget');
@@ -169,9 +213,9 @@
     $('browse-destination').onclick = () => showFolder('destination');
     $('browse-source').onclick = () => showFolder('source');
     $('export').onclick = () => action('/api/export', {start: $('start').value, end: $('end').value,
-      country: $('country').value, data_locale: $('data-locale').value, destination: $('destination').value});
+      country: countryValue(), data_locale: $('data-locale').value, destination: $('destination').value});
     $('convert').onclick = () => action('/api/convert', {source: $('source').value,
-      country: $('country').value, data_locale: $('data-locale').value, destination: $('destination').value});
+      country: countryValue(), data_locale: $('data-locale').value, destination: $('destination').value});
     $('cancel').onclick = () => action('/api/cancel');
     $('open-output').onclick = () => action('/api/open');
     $('copy-log').onclick = async () => { try { await navigator.clipboard.writeText($('log').textContent); } catch (error) { notice(error.message); } };

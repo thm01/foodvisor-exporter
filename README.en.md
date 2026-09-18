@@ -6,7 +6,7 @@ Foodvisor Exporter lets you export the diary data from your own Foodvisor accoun
 
 ## Installation and launch
 
-Download and extract the repository, then install **Python 3.9 or newer**. The launchers check this requirement and show an error if it is missing; they do not install it. A recent web browser is also needed.
+The source code requires **Python 3.9 or newer** and a recent browser. Executable archives, when available, include Python.
 
 | System | File to open |
 | --- | --- |
@@ -16,7 +16,7 @@ Download and extract the repository, then install **Python 3.9 or newer**. The l
 
 If your file manager does not run the Linux launcher, open a terminal in the project directory and run `bash Foodvisor-exporter-linux.sh`. On macOS, the `.command` file opens in Terminal. You can also start the interface directly with `python3 app/web_interface.py` (or `py -3 app\web_interface.py` on Windows). The program opens a page in your browser automatically; if that fails, copy the local address shown in the terminal.
 
-The application needs no other Python library. To enable the optional system credential store, install `keyring` with `python3 -m pip install keyring` (or `py -3 -m pip install keyring` on Windows). A compatible system credential store must also be available; otherwise, you can still log in manually. The archives built by the GitHub Actions workflow include `keyring` and Python, so users of those archives do not need a separate Python installation.
+The source version has no additional required dependencies. To save your password in the system credential store, optionally install `keyring` with `python3 -m pip install keyring` (or `py -3 -m pip install keyring` on Windows).
 
 ## Using the graphical interface
 
@@ -25,13 +25,13 @@ The application needs no other Python library. To enable the optional system cre
 3. Click **Log in**. The window waits for Foodvisor's response and enables the date range and export only after it receives an access token. If the response contains your account preferences, it automatically fills in the country and supported language. Before logging in, you can select **Remember password in the system credential store**; this option is disabled if no compatible credential store is available.
 4. Choose the date range in **DD-MM-YYYY** format or with the calendars, then choose the destination directory. You can enter its path or select it in the page's folder browser. Start the export. The page shows progress and errors. **Cancel** stops processing between requests; a request already in progress can take up to 30 seconds.
 
-The “Country” field suggests the two-letter ISO codes `BE`, `FR`, `CH`, `LU`, `CA`, `US`, `GB`, `DE`, `ES`, and `IT`. These are suggestions, not a list of countries officially confirmed by Foodvisor. Your computer's region is only a suggestion: it may differ from the account's food country. The selected code is used in the API URL; the service may still reject a valid ISO code.
+The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
 
 Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `donnees-brutes/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
 
 **Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
 
-The page communicates only with a local server bound to `127.0.0.1`. The Python program contacts Foodvisor; the browser does not contact it directly. Use **Quit** on the page to stop the local server. The interface language and, after a login attempt, the email address are saved locally. The token is never written to disk. The application saves the password only if you explicitly enable the system credential store; your browser may separately offer to save it. To log in, the application sends your password directly to Foodvisor over HTTPS. It does not send your credentials to the project creator.
+The interface uses a local server (`127.0.0.1`), which contacts Foodvisor over HTTPS. **Quit** stops it; closing the page stops it after about two minutes of inactivity. The token stays in memory, and the password is saved only if you enable the system credential store.
 
 ## Command line
 

@@ -12,6 +12,7 @@ import secrets
 import subprocess
 import sys
 import threading
+import time
 from urllib.parse import parse_qs, urlsplit
 import webbrowser
 
@@ -26,6 +27,7 @@ from i18n import TEXT
 CONFIG = Path.home() / '.foodvisor-exporter-gui.json'
 ASSETS = Path(__file__).resolve().parent / 'web'
 COUNTRIES = ('BE', 'FR', 'CH', 'LU', 'CA', 'US', 'GB', 'DE', 'ES', 'IT')
+IDLE_TIMEOUT = 120
 
 
 def load_config():
@@ -99,6 +101,8 @@ class WebApplication:
         self.messages = []
         self.csrf = secrets.token_urlsafe(32)
         self.server = None
+        self.last_seen = time.monotonic()
+        self.stop_event = threading.Event()
 
     def t(self, key):
         return TEXT[self.language][key]
@@ -133,9 +137,9 @@ class WebApplication:
                 'end': format_date(dt.date.today()),
             }
 
-    def _check_options(self, country, data_locale):
+    def _check_options(self, country, data_locale, require_country=True):
         country = str(country).strip().upper()
-        if not re.fullmatch(r'[A-Z]{2}', country):
+        if (require_country or country) and not re.fullmatch(r'[A-Z]{2}', country):
             raise ValueError(self.t('bad_country'))
         if data_locale not in ('fr', 'en'):
             raise ValueError(self.t('bad_locale'))
@@ -157,7 +161,8 @@ class WebApplication:
                 self.remember = bool(payload['remember']) and self.keyring_available
             if 'country' in payload or 'data_locale' in payload:
                 country, data_locale = self._check_options(
-                    payload.get('country', self.country), payload.get('data_locale', self.data_locale))
+                    payload.get('country', self.country), payload.get('data_locale', self.data_locale),
+                    require_country=bool(self.session and self.session.authenticated))
                 changed = (country, data_locale) != (self.country, self.data_locale)
                 self.country, self.data_locale = country, data_locale
                 if changed and self.session and self.session.authenticated and not self.busy:
@@ -267,7 +272,8 @@ class WebApplication:
             if self.busy or self.authenticating:
                 raise ValueError(self.t('working'))
             country, data_locale = self._check_options(payload.get('country', self.country),
-                                                       payload.get('data_locale', self.data_locale))
+                                                       payload.get('data_locale', self.data_locale),
+                                                       require_country=not offline)
             if offline:
                 source = Path(str(payload.get('source', ''))).expanduser()
                 if not all((source / name).is_file() for name in ('manifest.json', 'termine.json')):
@@ -345,7 +351,11 @@ class WebApplication:
         return {'path': str(path), 'parent': str(path.parent), 'children': children[:300]}
 
     def quit(self):
-        self.cancel()
+        with self.lock:
+            if self.stop_event.is_set():
+                return
+            self.stop_event.set()
+            self.cancel()
         def stop():
             worker = self.worker_thread
             if worker and worker.is_alive():
@@ -356,6 +366,24 @@ class WebApplication:
                 self.session = None
             self.server.shutdown()
         threading.Thread(target=stop, daemon=True).start()
+
+    def seen(self):
+        with self.lock:
+            self.last_seen = time.monotonic()
+
+    def idle_expired(self, now=None):
+        with self.lock:
+            current = time.monotonic() if now is None else now
+            return (current - self.last_seen >= IDLE_TIMEOUT and not self.busy
+                    and not self.authenticating and not self.stop_event.is_set())
+
+    def watch_browser(self, interval=5):
+        def watch():
+            while not self.stop_event.wait(interval):
+                if self.idle_expired():
+                    self.quit()
+                    return
+        threading.Thread(target=watch, daemon=True).start()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -391,6 +419,10 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         try:
             if url.path == '/api/state':
+                if self.headers.get('X-CSRF-Token') != app.csrf:
+                    self.send_error(HTTPStatus.FORBIDDEN)
+                    return
+                app.seen()
                 self._json(200, app.snapshot())
             elif url.path == '/api/i18n':
                 self._json(200, {'csrf': app.csrf, 'ui': TEXT, 'countries': COUNTRIES})
@@ -460,6 +492,7 @@ def main():
     server.daemon_threads = True
     server.app = app
     app.server = server
+    app.watch_browser()
     url = f'http://127.0.0.1:{server.server_port}/'
     print(url, flush=True)
     webbrowser.open(url)
