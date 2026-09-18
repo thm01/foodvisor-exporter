@@ -194,6 +194,7 @@ def create(source, base, language='fr'):
            ['Jours vides', ', '.join(data['metadata']['days_without_meals']) or tr('Aucun')],
            ['Eau','L’onglet Eau affiche uniquement les volumes enregistrés. Une cellule vide ne signifie pas zéro consommation.'],
            ['Activités','Le total quotidien additionne les calories_burned des activités de ce jour. Il reste vide si une activité n’a pas de valeur valide. Mode et origine sont déduits du type et du fournisseur ; les champs Foodvisor bruts restent disponibles.'],
+           ['Activités','Les activités saisies manuellement sont exportées lorsqu’elles figurent dans le journal renvoyé par Foodvisor. Les activités Santé Connect visibles sur le téléphone peuvent en être absentes.'],
            ['Précision','Affichage à deux décimales ; les totaux sont calculés avant arrondi. Aucune comparaison visuelle avec les totaux affichés dans l’application n’a été faite.'],
            ['Source','JSON fusionné Foodvisor conservé séparément pour tous les champs bruts et les détails non affichés ici.']]
     sheets=[('Par jour',[['Date','Repas enregistrés','Lignes alimentaires',*LABELS,'Eau enregistrée (ml)','Disponibilité des valeurs','Activités enregistrées','Calories dépensées (kcal)']]+day_rows,[15,18,20,18,18,18,18,18,23,28,21,25]),
