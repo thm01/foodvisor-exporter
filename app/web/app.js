@@ -51,8 +51,6 @@
     $('remember-label').textContent = t(state.keyring_available ? 'remember_password' : 'remember_unavailable');
     $('country').placeholder = t('country_custom');
     $('country').setAttribute('aria-label', t('country_custom'));
-    $('start-picker').setAttribute('aria-label', t('start'));
-    $('end-picker').setAttribute('aria-label', t('end'));
   }
   function render(next, initial = false) {
     const wasConnected = previousConnected;
@@ -66,9 +64,8 @@
       setCountry(state.country);
       $('data-locale').value = state.data_locale;
       $('destination').value = state.destination;
-      $('start').value = state.start;
-      $('end').value = state.end;
-      syncPicker('start'); syncPicker('end');
+      $('start').value = isoFromText(state.start);
+      $('end').value = isoFromText(state.end);
       if (!state.country) $('advanced-options').open = true;
     } else if (!wasConnected && state.connected) {
       setCountry(state.country);
@@ -95,7 +92,7 @@
     $('email').disabled = busy || state.connected;
     $('password').disabled = busy || state.connected;
     $('remember').disabled = busy || state.connected || !state.keyring_available;
-    ['start', 'end', 'start-picker', 'end-picker'].forEach(id => { $(id).disabled = busy || !state.connected; });
+    ['start', 'end'].forEach(id => { $(id).disabled = busy || !state.connected; });
     ['country-choice', 'country', 'data-locale', 'destination', 'source'].forEach(id => { $(id).disabled = busy; });
     $('browse-destination').disabled = busy;
     $('browse-source').disabled = busy;
@@ -152,15 +149,10 @@
     const date = new Date(`${iso}T12:00:00`);
     return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === iso ? iso : '';
   }
-  function syncPicker(id) {
-    $(id + '-picker').value = isoFromText($(id).value);
-  }
-  function syncText(id) {
-    const value = $(id + '-picker').value;
-    if (value) {
-      const [year, month, day] = value.split('-');
-      $(id).value = `${day}-${month}-${year}`;
-    }
+  function textFromIso(value) {
+    if (!value) return '';
+    const [year, month, day] = value.split('-');
+    return `${day}-${month}-${year}`;
   }
   async function settings(payload) {
     try { render(await request('/api/settings', payload)); scheduleRefresh(); }
@@ -236,13 +228,9 @@
     };
     $('logout').onclick = () => action('/api/logout');
     $('forget').onclick = () => action('/api/forget');
-    for (const id of ['start', 'end']) {
-      $(id).onchange = () => syncPicker(id);
-      $(id + '-picker').onchange = () => syncText(id);
-    }
     $('browse-destination').onclick = () => showFolder('destination');
     $('browse-source').onclick = () => showFolder('source');
-    $('export').onclick = () => action('/api/export', {start: $('start').value, end: $('end').value,
+    $('export').onclick = () => action('/api/export', {start: textFromIso($('start').value), end: textFromIso($('end').value),
       country: countryValue(), data_locale: $('data-locale').value, destination: $('destination').value});
     $('convert').onclick = () => action('/api/convert', {source: $('source').value,
       country: countryValue(), data_locale: $('data-locale').value, destination: $('destination').value});

@@ -6,7 +6,7 @@ Foodvisor Exporter permet d'exporter les données du journal de son propre compt
 
 ## Installation et lancement
 
-Le code source nécessite **Python 3.9 ou plus récent** et un navigateur récent. Les archives exécutables, lorsqu'elles sont disponibles, incluent Python.
+Le code source nécessite [**Python 3.9 ou plus récent**](https://www.python.org/downloads/) et un navigateur récent. Les archives exécutables, lorsqu'elles sont disponibles, incluent Python.
 
 | Système | Fichier à ouvrir |
 | --- | --- |
@@ -23,7 +23,7 @@ La version source fonctionne sans dépendance supplémentaire. Pour mémoriser l
 1. Choisissez la langue de l'interface dans le menu en haut à droite. La langue des données la suit par défaut.
 2. Saisissez l'adresse e-mail et le mot de passe de votre compte Foodvisor personnel. Le volet **Options avancées** permet de modifier le pays détecté et la langue des données ; il s'ouvre automatiquement si aucun pays n'a été trouvé.
 3. Cliquez sur **Se connecter**. La période et l'export s'activent après la réponse de Foodvisor. Les préférences du compte peuvent renseigner le pays et la langue des données, sauf si vous avez choisi cette dernière manuellement. Le coffre système peut mémoriser le mot de passe s'il est disponible.
-4. Choisissez la période au format **JJ-MM-AAAA** ou avec les calendriers, puis le dossier de destination. Vous pouvez saisir son chemin ou le choisir dans l'explorateur de dossiers de la page. Lancez ensuite l'export. La page affiche la progression et les erreurs. **Annuler** arrête le traitement entre deux requêtes ; une requête déjà en cours peut prendre jusqu'à 30 secondes.
+4. Choisissez les dates dans les calendriers, puis le dossier de destination. Vous pouvez saisir son chemin ou le choisir dans l'explorateur de dossiers de la page. Lancez ensuite l'export. La page affiche la progression et les erreurs. **Annuler** arrête le traitement entre deux requêtes ; une requête déjà en cours peut prendre jusqu'à 30 secondes.
 
 Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un code ISO à deux lettres. Foodvisor peut refuser certains codes.
 
