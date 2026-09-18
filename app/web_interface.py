@@ -52,6 +52,20 @@ def default_language(config):
     return 'fr' if system.lower().startswith('fr') else 'en'
 
 
+def saved_country(config):
+    value = config.get('country')
+    return value.strip().upper() if isinstance(value, str) and re.fullmatch(r'[A-Za-z]{2}', value.strip()) else ''
+
+
+def default_country(config):
+    saved = saved_country(config)
+    if saved:
+        return saved
+    system = locale.getlocale()[0] or ''
+    region = re.search(r'[_-]([A-Za-z]{2})(?:[.@]|$)', system)
+    return region.group(1).upper() if region else ''
+
+
 def reveal_folder(path):
     if sys.platform == 'win32':
         os.startfile(str(path))
@@ -70,7 +84,8 @@ class WebApplication:
         self.remembered_email = config.get('remembered_email') if isinstance(config.get('remembered_email'), str) else None
         self.keyring_available = credential_store.secure_keyring() is not None
         self.remember = bool(config.get('remember_password')) and self.keyring_available
-        self.country = 'BE'
+        self.saved_country = saved_country(config)
+        self.country = default_country(config)
         self.data_locale = 'fr'
         self.destination = str(Path.home() / 'Foodvisor-exports')
         self.session = None
@@ -91,6 +106,8 @@ class WebApplication:
     def _save(self):
         value = {'ui_language': self.language, 'email': self.email,
                  'remember_password': self.remember}
+        if self.saved_country:
+            value['country'] = self.saved_country
         if self.remembered_email:
             value['remembered_email'] = self.remembered_email
         save_config(value)
@@ -145,6 +162,7 @@ class WebApplication:
                 self.country, self.data_locale = country, data_locale
                 if changed and self.session and self.session.authenticated and not self.busy:
                     self.session.set_options(country, data_locale)
+                    self.saved_country = country
                     self._log(self.t('options_applied').format(country=country, locale=data_locale))
             self._save()
 
@@ -192,6 +210,7 @@ class WebApplication:
                 self.country = session.preferred_country or country
                 self.data_locale = session.preferred_locale or data_locale
                 self.session.set_options(self.country, self.data_locale)
+                self.saved_country = self.country
                 self.remembered_email, self.remember = saved_mail, remember
                 self.status = 'connected'
                 self._log(self.t('connected'))
@@ -269,6 +288,8 @@ class WebApplication:
                            'session': self.session}
             destination = self._destination(payload.get('destination', self.destination))
             self.country, self.data_locale, self.destination = country, data_locale, str(destination)
+            if not offline and self.session and self.session.authenticated:
+                self.saved_country = country
             self._save()
             self.busy, self.error = True, None
             self.status = 'converting' if offline else 'working'

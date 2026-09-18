@@ -21,11 +21,11 @@ The application needs no other Python library. To enable the optional system cre
 ## Using the graphical interface
 
 1. Choose the interface language at the top of the page. This setting does not change the language of exported data.
-2. Enter the email address and password for your personal Foodvisor account. The country and data language (`fr` or `en`) have initial values that you can change if needed. The data language determines the responses requested from Foodvisor and the CSV/XLSX labels.
+2. Enter the email address and password for your personal Foodvisor account. The country uses the last code you used or, on first launch, your computer's region if available. Choose a code if the field is empty. You can change the data language (`fr` or `en`); it determines the responses requested from Foodvisor and the CSV/XLSX labels.
 3. Click **Log in**. The window waits for Foodvisor's response and enables the date range and export only after it receives an access token. If the response contains your account preferences, it automatically fills in the country and supported language. Before logging in, you can select **Remember password in the system credential store**; this option is disabled if no compatible credential store is available.
 4. Choose the date range in **DD-MM-YYYY** format or with the calendars, then choose the destination directory. You can enter its path or select it in the page's folder browser. Start the export. The page shows progress and errors. **Cancel** stops processing between requests; a request already in progress can take up to 30 seconds.
 
-The “Country” field suggests the two-letter ISO codes `BE`, `FR`, `CH`, `LU`, `CA`, `US`, `GB`, `DE`, `ES`, and `IT`. These are suggestions, not a list of countries officially confirmed by Foodvisor. The selected code is used in the API URL; the service may still reject a valid ISO code.
+The “Country” field suggests the two-letter ISO codes `BE`, `FR`, `CH`, `LU`, `CA`, `US`, `GB`, `DE`, `ES`, and `IT`. These are suggestions, not a list of countries officially confirmed by Foodvisor. Your computer's region is only a suggestion: it may differ from the account's food country. The selected code is used in the API URL; the service may still reject a valid ISO code.
 
 Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `donnees-brutes/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
 
