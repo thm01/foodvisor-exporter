@@ -28,6 +28,7 @@ The source version has no additional required dependencies. To save your passwor
 The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
 
 Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `sources/`. Activities also appear in `Foodvisor-activities.csv` and `.json`; their daily totals appear in `Foodvisor-days.csv` and the workbook. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor.
+Export labels follow the selected data language. An unknown activity origin appears as “Other”, with its raw Foodvisor value kept in a separate column.
 
 **Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
 

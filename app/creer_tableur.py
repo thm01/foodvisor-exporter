@@ -15,11 +15,37 @@ from i18n import TRANSLATIONS
 MACROS = [('calories_100g', 1), ('proteins_100g', 4), ('carbs_100g', 4), ('lipids_100g', 9), ('fibers_100g', 2)]
 LABELS = ['Calories (kcal)', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Fibres (g)']
 TYPES = {'breakfast': 'Petit-déjeuner', 'lunch': 'Déjeuner', 'dinner': 'Dîner', 'snack': 'Collation'}
+ORIGIN_NAMES = {'manual': 'Ajout manuel', 'google_fit': 'Google Fit', 'health_connect': 'Health Connect',
+                'apple_health': 'Apple Santé', 'fitbit': 'Fitbit', 'other': 'Autre'}
+ORIGIN_ALIASES = {'googlefit': 'google_fit', 'google fit': 'google_fit',
+                  'healthconnect': 'health_connect', 'health connect': 'health_connect',
+                  'apple health': 'apple_health', 'apple_health': 'apple_health',
+                  'apple santé': 'apple_health', 'foodvisor': 'manual'}
 
 
 def total(rows, index):
     values = [r[index] for r in rows]
     return sum(values) if values and all(v is not None for v in values) else None
+
+
+def activity_origin(record):
+    kind = str(record.get('type') or '').strip().lower()
+    if kind in ('foodvisor', 'custom'):
+        return 'manual'
+    for value in (record.get('sync_provider'), record.get('source')):
+        name = str(value or '').strip().lower()
+        name = ORIGIN_ALIASES.get(name, name)
+        if name in ORIGIN_NAMES:
+            return name
+    return 'other'
+
+
+def activity_method(record, origin):
+    if origin == 'manual':
+        return 'manual'
+    if origin != 'other' or str(record.get('type') or '').lower() == 'sync_provider' or record.get('sync_provider'):
+        return 'sync'
+    return 'other'
 
 
 def activity_rows(records, tr):
@@ -35,14 +61,12 @@ def activity_rows(records, tr):
             burned = None
         kind = record.get('type')
         provider = record.get('sync_provider')
-        if kind == 'sync_provider' or provider:
-            method = tr('Synchronisation')
-        elif kind in ('foodvisor', 'custom'):
-            method = tr('Ajout manuel')
-        else:
-            method = ''
+        origin = activity_origin(record)
+        method = activity_method(record, origin)
+        method_label = tr({'manual': 'Ajout manuel', 'sync': 'Synchronisation', 'other': 'Autre'}[method])
         rows.append([day, timestamp, record.get('name') or record.get('activity') or record.get('custom_activity') or '',
-                     record.get('duration'), burned, method, record.get('source') or '', provider or '',
+                     record.get('duration'), burned, method_label, tr(ORIGIN_NAMES[origin]),
+                     record.get('source') or '', provider or '',
                      kind or '', record.get('activity') or '', record.get('custom_activity') or '',
                      record.get('local_id') or ''])
     return rows
@@ -157,7 +181,7 @@ def create(source, base, language='fr'):
                          len(daily_activities), burned])
     headers=['Date','Repas','Aliment','Dans le plat','Masse calculée (g)','Nombre d’unités','Unité',*LABELS,'Disponibilité des valeurs','Identifiant alimentaire']
     activity_headers=['Date','Date et heure','Activité','Durée','Calories dépensées (kcal)',
-                      'Mode d’ajout','Source','Fournisseur de synchronisation','Type d’activité',
+                      'Mode d’ajout','Origine','Source Foodvisor','Fournisseur de synchronisation','Type d’activité',
                       'Référence activité','Référence activité personnalisée','Identifiant activité']
     notes=[['Sujet','Explication'],
            ['Période',tr('Du {start} au {end} inclus. {meals} repas ; {foods} fiches alimentaires.').format(start=start, end=end, meals=len(meal_rows), foods=len(foods))],
@@ -169,14 +193,14 @@ def create(source, base, language='fr'):
            ['Valeurs absentes','Cellule vide = valeur absente. Un total est vide si au moins une de ses composantes est inconnue ; les absences ne sont pas transformées en zéro.'],
            ['Jours vides', ', '.join(data['metadata']['days_without_meals']) or tr('Aucun')],
            ['Eau','L’onglet Eau affiche uniquement les volumes enregistrés. Une cellule vide ne signifie pas zéro consommation.'],
-           ['Activités','Le total quotidien additionne les calories_burned des activités de ce jour. Il reste vide si une activité n’a pas de valeur valide. Le mode d’ajout est déduit du type ; source, fournisseur et durée sont conservés tels que fournis par Foodvisor.'],
+           ['Activités','Le total quotidien additionne les calories_burned des activités de ce jour. Il reste vide si une activité n’a pas de valeur valide. Mode et origine sont déduits du type et du fournisseur ; les champs Foodvisor bruts restent disponibles.'],
            ['Précision','Affichage à deux décimales ; les totaux sont calculés avant arrondi. Aucune comparaison visuelle avec les totaux affichés dans l’application n’a été faite.'],
            ['Source','JSON fusionné Foodvisor conservé séparément pour tous les champs bruts et les détails non affichés ici.']]
     sheets=[('Par jour',[['Date','Repas enregistrés','Lignes alimentaires',*LABELS,'Eau enregistrée (ml)','Disponibilité des valeurs','Activités enregistrées','Calories dépensées (kcal)']]+day_rows,[15,18,20,18,18,18,18,18,23,28,21,25]),
             ('Par repas',[['Date','Repas','Lignes alimentaires',*LABELS,'Disponibilité des valeurs']]+meal_rows,[15,22,20,18,18,18,18,18,28]),
             ('Aliments',[headers]+rows,[15,22,58,45,22,20,20,18,18,18,18,18,28,38]),
             ('Eau',[['Date','Eau enregistrée (ml)']]+[[k,v] for k,v in sorted(water.items())],[15,24]),
-            ('Activités',[activity_headers]+activities,[15,32,34,15,24,20,24,28,20,28,32,38]),
+            ('Activités',[activity_headers]+activities,[15,32,34,15,24,20,22,24,28,20,28,32,38]),
             ('À lire',notes,[26,120])]
     headers = [tr(value) for value in headers]
     activity_headers = [tr(value) for value in activity_headers]
@@ -191,15 +215,19 @@ def create(source, base, language='fr'):
     write_csv(activity_csv, activity_headers, activities)
     day_csv = base.with_name(base.name + '-days').with_suffix('.csv')
     write_csv(day_csv, sheets[0][1][0], day_rows)
-    activity_keys = ('date', 'timestamp', 'name', 'duration', 'calories_burned', 'entry_method',
-                     'source', 'sync_provider', 'type', 'activity', 'custom_activity', 'local_id')
+    activity_keys = ('date', 'timestamp', 'name', 'duration', 'calories_burned', 'entry_method_label',
+                     'origin_label', 'source', 'sync_provider', 'type', 'activity', 'custom_activity', 'local_id')
     normalized_activities = []
-    for row in activities:
+    for record, row in zip(data.get('activity_logs', []), activities):
         item = dict(zip(activity_keys, row))
-        item['entry_method'] = ('sync' if row[5] == tr('Synchronisation') else
-                                'manual' if row[5] == tr('Ajout manuel') else None)
+        item['origin'] = activity_origin(record)
+        item['entry_method'] = activity_method(record, item['origin'])
         normalized_activities.append(item)
-    summary = {'activities': normalized_activities,
+    summary = {'language': language,
+               'labels': dict(zip(activity_keys, activity_headers)),
+               'daily_labels': {'date': tr('Date'), 'activity_count': tr('Activités enregistrées'),
+                                'calories_burned': tr('Calories dépensées (kcal)')},
+               'activities': normalized_activities,
                'daily_totals': [{'date': row[0], 'activity_count': row[-2], 'calories_burned': row[-1]}
                                 for row in day_rows]}
     activity_json = base.with_name(base.name + '-activities').with_suffix('.json')
