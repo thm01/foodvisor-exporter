@@ -29,7 +29,7 @@ Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un 
 
 Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `sources/`. Les activités figurent aussi dans `Foodvisor-activities.csv` et `.json` ; leur total quotidien apparaît dans `Foodvisor-days.csv` et le classeur. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. La conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor.
 Les libellés des exports suivent la langue des données choisie. Une origine d'activité inconnue apparaît comme « Autre », avec sa valeur Foodvisor conservée dans une colonne distincte.
-Les activités saisies manuellement dans Foodvisor sont exportées lorsqu’elles figurent dans le journal reçu. Les activités Santé Connect visibles sur le téléphone peuvent manquer : l’exporteur ne lit pas directement les données du téléphone.
+Les activités saisies manuellement dans Foodvisor sont exportées lorsqu’elles figurent dans le journal reçu. Les activités issues de Santé Connect ou d’Apple Santé peuvent manquer : l’exporteur ne lit pas directement les données du téléphone.
 
 **Se déconnecter** efface le jeton en mémoire et reverrouille l'export. Le pays et la langue des données restent modifiables après connexion ; leurs changements s'appliquent au prochain export sans nouvelle connexion. Pour changer de compte, déconnectez-vous d'abord. La conversion hors ligne reste accessible sans connexion. **Oublier le mot de passe** le retire du coffre système ; décocher l'option de mémorisation a le même effet.
 
