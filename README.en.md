@@ -2,63 +2,79 @@
 
 English · [Français](README.md)
 
-Foodvisor Exporter lets you export the diary data from your own Foodvisor account as JSON, CSV, and XLSX. This is an **unofficial, independent project with no affiliation to Foodvisor**. It uses a private API that may change or reject requests. Check [Foodvisor's terms of service](https://www.foodvisor.io/fr/terms-of-service/raw/) before using it.
+Foodvisor Exporter retrieves the diary from your own Foodvisor account and creates a workbook you can open in Excel or LibreOffice Calc. This is an **unofficial, independent project with no affiliation to Foodvisor**. It uses a private API that may change or reject requests. Check [Foodvisor’s terms of service](https://www.foodvisor.io/fr/terms-of-service/raw/) before using it.
 
-## Installation and launch
+## Install and launch
 
-The source code requires [**Python 3.9 or newer**](https://www.python.org/downloads/) and a recent browser. Executable archives, when available, include Python.
+1. [Download the repository as a ZIP](https://github.com/thm01/foodvisor-exporter/archive/refs/heads/main.zip), then extract it. Keep the files and the `app/` directory together.
+2. Install [Python 3.9 or newer](https://www.python.org/downloads/) if needed. The source version has no additional required Python packages; you only need a recent browser for the interface.
+3. Open the launcher for your system **inside the extracted directory**:
 
-| System | File to open |
+   | System | Launcher |
+   | --- | --- |
+   | Windows | `Foodvisor-exporter-windows.cmd` |
+   | macOS | `Foodvisor-exporter-macos.command` |
+   | Linux | `Foodvisor-exporter-linux.sh` |
+
+The application normally opens a page in your browser. If it does not, copy the `http://127.0.0.1:…` address shown in the terminal. On Linux, if your file manager does not launch the script, run `bash Foodvisor-exporter-linux.sh` in a terminal opened in the extracted directory. You can also start the interface with `python3 app/web_interface.py` (`py -3 app\web_interface.py` on Windows).
+
+To save your password in the system credential store, you may **optionally** install `keyring` using `python3 -m pip install keyring` (`py -3 -m pip install keyring` on Windows). Without this option, the application does not save your password.
+
+## Export your data
+
+1. Choose the interface language in the menu. The data language follows it by default.
+2. Enter your Foodvisor account credentials and click **Log in**. You can adjust the country and data language under **Advanced options**. The suggested country comes from your computer or account preferences; Foodvisor may reject some codes.
+3. Choose the start and end dates in the calendars, then choose a destination directory. Both dates are included.
+4. Click **Export**. Progress and errors appear on the page. When the export finishes, click **Open folder**, then open `Foodvisor.xlsx`.
+
+**Cancel** stops processing between requests; a request already in progress may take up to 30 seconds. **Log out** clears the session from memory. Use **Quit** to stop the local server; closing the page stops it after about two minutes of inactivity.
+
+## Understand the output
+
+Each export creates a timestamped directory with this structure:
+
+```text
+<timestamp>/
+├── Foodvisor.xlsx       Workbook to open
+├── data/                CSV, merged JSON, and completion report
+└── sources/             Raw JSON responses from Foodvisor
+```
+
+The `Foodvisor.xlsx` workbook contains:
+
+| Sheet | Contents |
 | --- | --- |
-| Windows | `Foodvisor-exporter-windows.cmd` |
-| macOS | `Foodvisor-exporter-macos.command` |
-| Linux | `Foodvisor-exporter-linux.sh` |
+| **By day** | Daily meal and nutrient totals, recorded water, activity count, and received burned kcal. |
+| **By meal** | Nutrient totals for each meal. |
+| **Foods** | Food and dish details, quantities, and nutrients. |
+| **Water** | Recorded water volumes, when present in the diary. |
+| **Activities** | Received activities, duration, burned kcal, entry method, and origin. |
+| **Read me** | Calculation methods and explanations of missing values. |
 
-If your file manager does not run the Linux launcher, open a terminal in the project directory and run `bash Foodvisor-exporter-linux.sh`. On macOS, the `.command` file opens in Terminal. You can also start the interface directly with `python3 app/web_interface.py` (or `py -3 app\web_interface.py` on Windows). The program opens a page in your browser automatically; if that fails, copy the local address shown in the terminal.
+In `data/`, `Foodvisor.csv` contains food details, `Foodvisor-days.csv` contains daily summaries, and `Foodvisor-activities.csv` contains activities. `Foodvisor-activities.json` provides activities and daily totals; `historique.json` preserves the merged diary. The `sources/` directory lets you convert the export again without connecting. Workbook and CSV headers, along with display labels in the activities JSON, follow the selected data language; names supplied by Foodvisor are not translated. An unknown activity origin appears as “Other”, with the raw value kept alongside it.
 
-The source version has no additional required dependencies. To save your password in the system credential store, optionally install `keyring` with `python3 -m pip install keyring` (or `py -3 -m pip install keyring` on Windows).
+These files may contain sensitive personal data: keep the directory in a private location.
 
-## Using the graphical interface
+## Convert previously downloaded data
 
-1. Choose the interface language from the menu at the top right. The data language follows it by default.
-2. Enter the email address and password for your personal Foodvisor account. **Advanced options** lets you change the detected country and data language; it opens automatically if no country was found.
-3. Click **Log in**. The date range and export become available after Foodvisor responds. Account preferences may fill in the country and data language unless you selected the latter manually. The system credential store can remember your password when available.
-4. Choose the dates in the calendars, then choose the destination directory. You can enter its path or select it in the page's folder browser. Start the export. The page shows progress and errors. **Cancel** stops processing between requests; a request already in progress can take up to 30 seconds.
-
-The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
-
-Each successful export creates a timestamped directory: open `Foodvisor.xlsx` at its root to view meals, water, and activities. CSV and JSON files, including merged data and daily totals, are in `data/`; raw responses are in `sources/`. You can convert previously downloaded data without connecting to Foodvisor; the sources are copied into the new export. These files may contain sensitive personal data: keep them in a private location.
-Export labels follow the selected data language. An unknown activity origin appears as “Other”, with its raw Foodvisor value kept in a separate column.
-Manually entered Foodvisor activities are exported when present in the received journal. Activities from Health Connect or Apple Health may be missing: the exporter does not read phone data directly.
-
-**Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
-
-The interface uses a local server (`127.0.0.1`), which contacts Foodvisor over HTTPS. **Quit** stops it; closing the page stops it after about two minutes of inactivity. The token stays in memory, and the password is saved only if you enable the system credential store.
+In the interface, select the `sources/` directory of an existing export, then click **Convert previously downloaded data**. This works without connecting to Foodvisor and creates a self-contained export with a copy of the sources. Older `donnees-brutes/` directories are still accepted.
 
 ## Command line
 
-To export without the graphical interface:
+You can also export without the interface:
 
 ```bash
 bash Foodvisor-exporter.sh --start 2026-01-01 --end 2026-01-31
 ```
 
-In the terminal, dates use **YYYY-MM-DD** format. `--start` is required for a download; `--end` defaults to today. Both dates are inclusive. The country (`--country`) and data language (`--locale`) default to `BE` and `fr`, respectively. `--locale en` requests data in English and produces English CSV/XLSX labels. The program prompts for credentials in the terminal, then creates the files under `exports/<timestamp>/`.
+Terminal dates use **YYYY-MM-DD**. `--start` is required; `--end` defaults to today. `--country` defaults to `BE` and `--locale` to `fr`; `--locale en` produces English labels. The program prompts for credentials in the terminal and creates files under `exports/<timestamp>/`.
 
-To convert previously downloaded responses again, without connecting:
-
-```bash
-bash Foodvisor-exporter.sh --source exports/<timestamp>/sources
-```
-
-A normal command exits after one export. To run several exports in the same terminal and reuse the session, run `bash Foodvisor-exporter.sh --interactive`. Enter a date range in **YYYY-MM-DD** format for each export, then leave the start date blank to quit. The password is requested again only if the session is no longer valid. It is not stored on disk.
-Older `donnees-brutes/` folders still work with `--source` or offline conversion in the interface.
+To convert existing responses, use `bash Foodvisor-exporter.sh --source exports/<timestamp>/sources`. To run several exports with the same session, add `--interactive`; the password is requested again only if the session is no longer valid.
 
 ## Limitations
 
-The exporter reads the authenticated account's diary and the food records referenced by that diary. It does not browse the general catalog, change the account, or perform synchronization. Requests run sequentially with a one-second pause between them; this does not guarantee that Foodvisor will accept them.
+The exporter reads only the logged-in account’s diary and the food records it references. It does not browse the general catalog, change the account, or synchronize phone data. Manually entered activities are exported when present in the received diary; activities from Health Connect or Apple Health may be missing.
 
-The API may change, and results may be incomplete if the diary has not synchronized. Meal and food names come from Foodvisor and are not translated locally. The tool does not refresh tokens, download images, or schedule automatic exports. Check the output files before relying on them.
-Daily burned kcal are the sum of `calories_burned` from received activities; this may differ from the balance shown by Foodvisor.
+Daily burned kcal are the sum of `calories_burned` from received activities; they may differ from the balance shown by Foodvisor. Blank cells mean missing values, not necessarily zero. The API can change, and results may be incomplete. Requests are sequential with a one-second pause, which does not guarantee acceptance by Foodvisor. The tool does not refresh tokens, download images, or schedule exports. Check the data before relying on it.
 
-The repository contains no APK, decompiled code, secrets extracted from the application, or account data. To request your data through official channels, see [Foodvisor's privacy policy](https://www.foodvisor.io/fr/privacy-policy/raw/).
+The repository contains no APK, decompiled code, extracted app secrets, or account data. To request your data through official channels, see [Foodvisor’s privacy policy](https://www.foodvisor.io/fr/privacy-policy/raw/).
