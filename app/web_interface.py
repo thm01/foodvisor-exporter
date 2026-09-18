@@ -366,14 +366,18 @@ class WebApplication:
             self.stop_event.set()
             self.cancel()
         def stop():
-            worker = self.worker_thread
-            if worker and worker.is_alive():
-                worker.join(timeout=35)
-            with self.lock:
-                if self.session:
-                    self.session.logout()
-                self.session = None
-            self.server.shutdown()
+            try:
+                worker = self.worker_thread
+                if worker and worker.is_alive():
+                    worker.join(timeout=35)
+                with self.lock:
+                    try:
+                        if self.session:
+                            self.session.logout()
+                    finally:
+                        self.session = None
+            finally:
+                self.server.shutdown()
         threading.Thread(target=stop, daemon=True).start()
 
     def seen(self):

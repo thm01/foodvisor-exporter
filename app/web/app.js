@@ -260,9 +260,23 @@
     };
     $('quit').onclick = async () => {
       if (!confirm(t('quit_confirm'))) return;
-      stopped = true;
-      await action('/api/quit');
-      notice(t('server_stopped'));
+      try {
+        await request('/api/quit', {});
+        stopped = true;
+        clearTimeout(refreshTimer);
+        const closed = document.createElement('main');
+        closed.className = 'closed-screen';
+        const title = document.createElement('h1');
+        title.textContent = t('closed_title');
+        const hint = document.createElement('p');
+        hint.textContent = t('closed_hint');
+        closed.append(title, hint);
+        document.title = t('closed_title');
+        document.body.replaceChildren(closed);
+        try { window.close(); } catch (_) { /* The browser may keep this tab open. */ }
+      } catch (error) {
+        notice(error.message);
+      }
     };
   }
   document.addEventListener('DOMContentLoaded', init);
