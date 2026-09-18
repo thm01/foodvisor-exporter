@@ -51,11 +51,16 @@ def merge(source, output):
                     identity = (value["meal_date"], value["meal_type"])
                 elif key == "food_info":
                     identity = value["food_id"]
+                elif key == "activity_logs" and value.get("local_id"):
+                    identity = value["local_id"]
                 else:
                     identity = canonical(value)
                 if identity in records:
                     if records[identity] != value:
-                        raise ValueError(f"Versions contradictoires dans {key} : {identity}")
+                        if key == "activity_logs":
+                            records[identity] = value
+                        else:
+                            raise ValueError(f"Versions contradictoires dans {key} : {identity}")
                     duplicates[key] = duplicates.get(key, 0) + 1
                 else:
                     records[identity] = value
@@ -75,6 +80,7 @@ def merge(source, output):
             "start": start, "end": end, "complete": True,
             "source_files": [f.name for f in files],
             "meal_count": len(meals), "food_count": len(foods),
+            "activity_count": len(collections.get("activity_logs", {})),
             "days_with_meals": len(days), "days_without_meals": absent,
             "identical_duplicates_removed": duplicates,
             "records_outside_period_excluded": excluded,

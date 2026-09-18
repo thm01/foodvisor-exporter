@@ -5,6 +5,7 @@ import os
 import csv
 import datetime as dt
 import json
+import math
 from pathlib import Path
 import zipfile
 from xml.sax.saxutils import escape
@@ -19,6 +20,50 @@ TYPES = {'breakfast': 'Petit-déjeuner', 'lunch': 'Déjeuner', 'dinner': 'Dîner
 def total(rows, index):
     values = [r[index] for r in rows]
     return sum(values) if values and all(v is not None for v in values) else None
+
+
+def activity_rows(records, tr):
+    rows = []
+    for record in records:
+        timestamp = record.get('date') or ''
+        try:
+            day = dt.date.fromisoformat(timestamp[:10]).isoformat()
+        except (TypeError, ValueError):
+            day = ''
+        burned = record.get('calories_burned')
+        if isinstance(burned, bool) or not isinstance(burned, (int, float)) or not math.isfinite(burned) or burned < 0:
+            burned = None
+        kind = record.get('type')
+        provider = record.get('sync_provider')
+        if kind == 'sync_provider' or provider:
+            method = tr('Synchronisation')
+        elif kind in ('foodvisor', 'custom'):
+            method = tr('Ajout manuel')
+        else:
+            method = ''
+        rows.append([day, timestamp, record.get('name') or record.get('activity') or record.get('custom_activity') or '',
+                     record.get('duration'), burned, method, record.get('source') or '', provider or '',
+                     kind or '', record.get('activity') or '', record.get('custom_activity') or '',
+                     record.get('local_id') or ''])
+    return rows
+
+
+def csv_values(row):
+    values = []
+    for value in row:
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            value = f'{value:.6f}'.rstrip('0').rstrip('.').replace('.', ',')
+        elif isinstance(value, str) and value.startswith(('=', '+', '-', '@')):
+            value = "'" + value
+        values.append(value)
+    return values
+
+
+def write_csv(path, headers, rows):
+    with path.open('x', encoding='utf-8-sig', newline='') as stream:
+        writer = csv.writer(stream, delimiter=';')
+        writer.writerow(headers)
+        writer.writerows(csv_values(row) for row in rows)
 
 
 def column(n):
@@ -99,14 +144,21 @@ def create(source, base, language='fr'):
         local=rows[offset:]
         meal_rows.append([date,label,len(local),*[total(local,i) for i in range(7,12)],
                           tr('Complet') if local and all(r[12]==tr('Complet') for r in local) else tr('Valeurs manquantes')])
+    activities = activity_rows(data.get('activity_logs', []), tr)
     day_rows=[]
     water={v['date']:v['water_ml'] for v in data.get('water_trackers',[])}
     start=dt.date.fromisoformat(data['metadata']['start']);end=dt.date.fromisoformat(data['metadata']['end'])
     for n in range((end-start).days+1):
         day=str(start+dt.timedelta(days=n)); local=[r for r in rows if r[0]==day]
+        daily_activities = [r for r in activities if r[0] == day]
+        burned = sum(r[4] for r in daily_activities) if all(r[4] is not None for r in daily_activities) else None
         day_rows.append([day,sum(r[0]==day for r in meal_rows),len(local),*[total(local,i) for i in range(7,12)],water.get(day),
-                         tr('Aucun repas enregistré') if not local else (tr('Complet') if all(r[12]==tr('Complet') for r in local) else tr('Valeurs manquantes'))])
+                         tr('Aucun repas enregistré') if not local else (tr('Complet') if all(r[12]==tr('Complet') for r in local) else tr('Valeurs manquantes')),
+                         len(daily_activities), burned])
     headers=['Date','Repas','Aliment','Dans le plat','Masse calculée (g)','Nombre d’unités','Unité',*LABELS,'Disponibilité des valeurs','Identifiant alimentaire']
+    activity_headers=['Date','Date et heure','Activité','Durée','Calories dépensées (kcal)',
+                      'Mode d’ajout','Source','Fournisseur de synchronisation','Type d’activité',
+                      'Référence activité','Référence activité personnalisée','Identifiant activité']
     notes=[['Sujet','Explication'],
            ['Période',tr('Du {start} au {end} inclus. {meals} repas ; {foods} fiches alimentaires.').format(start=start, end=end, meals=len(meal_rows), foods=len(foods))],
            ['Lecture','Par jour : synthèse. Par repas : totaux. Aliments : lignes détaillées filtrables. Eau : volumes enregistrés.'],
@@ -117,35 +169,51 @@ def create(source, base, language='fr'):
            ['Valeurs absentes','Cellule vide = valeur absente. Un total est vide si au moins une de ses composantes est inconnue ; les absences ne sont pas transformées en zéro.'],
            ['Jours vides', ', '.join(data['metadata']['days_without_meals']) or tr('Aucun')],
            ['Eau','L’onglet Eau affiche uniquement les volumes enregistrés. Une cellule vide ne signifie pas zéro consommation.'],
+           ['Activités','Le total quotidien additionne les calories_burned des activités de ce jour. Il reste vide si une activité n’a pas de valeur valide. Le mode d’ajout est déduit du type ; source, fournisseur et durée sont conservés tels que fournis par Foodvisor.'],
            ['Précision','Affichage à deux décimales ; les totaux sont calculés avant arrondi. Aucune comparaison visuelle avec les totaux affichés dans l’application n’a été faite.'],
            ['Source','JSON fusionné Foodvisor conservé séparément pour tous les champs bruts et les détails non affichés ici.']]
-    sheets=[('Par jour',[['Date','Repas enregistrés','Lignes alimentaires',*LABELS,'Eau enregistrée (ml)','Disponibilité des valeurs']]+day_rows,[15,18,20,18,18,18,18,18,23,28]),
+    sheets=[('Par jour',[['Date','Repas enregistrés','Lignes alimentaires',*LABELS,'Eau enregistrée (ml)','Disponibilité des valeurs','Activités enregistrées','Calories dépensées (kcal)']]+day_rows,[15,18,20,18,18,18,18,18,23,28,21,25]),
             ('Par repas',[['Date','Repas','Lignes alimentaires',*LABELS,'Disponibilité des valeurs']]+meal_rows,[15,22,20,18,18,18,18,18,28]),
             ('Aliments',[headers]+rows,[15,22,58,45,22,20,20,18,18,18,18,18,28,38]),
             ('Eau',[['Date','Eau enregistrée (ml)']]+[[k,v] for k,v in sorted(water.items())],[15,24]),
+            ('Activités',[activity_headers]+activities,[15,32,34,15,24,20,24,28,20,28,32,38]),
             ('À lire',notes,[26,120])]
     headers = [tr(value) for value in headers]
+    activity_headers = [tr(value) for value in activity_headers]
     notes = [[tr(value) for value in row] for row in notes]
     sheets = [(tr(name), [[tr(value) if row_index == 0 else value for value in row]
                           for row_index, row in enumerate(content)], widths)
               for name, content, widths in sheets]
     sheets[-1] = (sheets[-1][0], notes, sheets[-1][2])
     make_xlsx(base.with_suffix('.xlsx'),sheets)
-    with base.with_suffix('.csv').open('x',encoding='utf-8-sig',newline='') as f:
-        w=csv.writer(f,delimiter=';');w.writerow(headers)
-        for row in rows:
-            vals=[]
-            for v in row:
-                if isinstance(v,(int,float)):v=f'{v:.6f}'.rstrip('0').rstrip('.').replace('.',',')
-                elif isinstance(v,str) and v.startswith(('=','+','-','@')):v="'"+v
-                vals.append(v)
-            w.writerow(vals)
+    write_csv(base.with_suffix('.csv'), headers, rows)
+    activity_csv = base.with_name(base.name + '-activities').with_suffix('.csv')
+    write_csv(activity_csv, activity_headers, activities)
+    day_csv = base.with_name(base.name + '-days').with_suffix('.csv')
+    write_csv(day_csv, sheets[0][1][0], day_rows)
+    activity_keys = ('date', 'timestamp', 'name', 'duration', 'calories_burned', 'entry_method',
+                     'source', 'sync_provider', 'type', 'activity', 'custom_activity', 'local_id')
+    normalized_activities = []
+    for row in activities:
+        item = dict(zip(activity_keys, row))
+        item['entry_method'] = ('sync' if row[5] == tr('Synchronisation') else
+                                'manual' if row[5] == tr('Ajout manuel') else None)
+        normalized_activities.append(item)
+    summary = {'activities': normalized_activities,
+               'daily_totals': [{'date': row[0], 'activity_count': row[-2], 'calories_burned': row[-1]}
+                                for row in day_rows]}
+    activity_json = base.with_name(base.name + '-activities').with_suffix('.json')
+    with activity_json.open('x', encoding='utf-8') as stream:
+        json.dump(summary, stream, ensure_ascii=False, indent=2)
+        stream.write('\n')
     assert len(meal_rows)==len(data['macro_meals']) and len(day_rows)==(end-start).days+1
     for i in range(5):
         if all(r[7+i] is not None for r in rows):
             assert abs(sum(r[7+i] for r in rows)-sum(r[3+i] for r in meal_rows))<1e-6
             assert abs(sum(r[7+i] for r in rows)-sum(r[3+i] or 0 for r in day_rows))<1e-6
     with base.with_suffix('.csv').open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.reader(f,delimiter=';')))==len(rows)+1
+    with activity_csv.open(encoding='utf-8-sig', newline='') as f:
+        assert len(list(csv.reader(f, delimiter=';'))) == len(activities) + 1
     print(json.dumps({'xlsx':str(base.with_suffix('.xlsx')),'csv':str(base.with_suffix('.csv')),'lignes_aliments':len(rows),'repas':len(meal_rows),'jours':len(day_rows),'valeurs_incompletes':sum(r[12]!=tr('Complet') for r in rows)},ensure_ascii=False,indent=2))
 
 

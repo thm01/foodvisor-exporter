@@ -27,7 +27,7 @@ La version source fonctionne sans dépendance supplémentaire. Pour mémoriser l
 
 Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un code ISO à deux lettres. Foodvisor peut refuser certains codes.
 
-Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `sources/`. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. L'option de conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor ; son avancement et son résultat s'affichent dans la fenêtre. Le diagnostic peut être effacé avec le bouton prévu à cet effet.
+Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `sources/`. Les activités figurent aussi dans `Foodvisor-activities.csv` et `.json` ; leur total quotidien apparaît dans `Foodvisor-days.csv` et le classeur. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. La conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor.
 
 **Se déconnecter** efface le jeton en mémoire et reverrouille l'export. Le pays et la langue des données restent modifiables après connexion ; leurs changements s'appliquent au prochain export sans nouvelle connexion. Pour changer de compte, déconnectez-vous d'abord. La conversion hors ligne reste accessible sans connexion. **Oublier le mot de passe** le retire du coffre système ; décocher l'option de mémorisation a le même effet.
 
@@ -57,5 +57,6 @@ Les anciens dossiers `donnees-brutes/` restent utilisables avec `--source` ou la
 L'exporteur lit le journal du compte authentifié et les fiches alimentaires référencées par ce journal. Il ne parcourt pas le catalogue général, ne modifie pas le compte et n'effectue aucune synchronisation. Les requêtes sont séquentielles, espacées d'une seconde ; cette précaution ne garantit pas leur acceptation par Foodvisor.
 
 L'API peut changer, et les résultats peuvent être incomplets si le journal n'est pas synchronisé. Les noms de plats et d'aliments proviennent de Foodvisor et ne sont pas traduits localement. L'outil ne renouvelle pas les jetons, ne télécharge pas les images et ne programme pas d'export automatique. Vérifiez les fichiers obtenus avant de vous y fier.
+Les kcal dépensées par jour sont la somme des `calories_burned` des activités reçues ; ce chiffre peut différer du bilan affiché par Foodvisor.
 
 Le dépôt ne contient aucun APK, code décompilé, secret extrait de l'application ou donnée de compte. Pour demander officiellement vos données, consultez la [politique de confidentialité de Foodvisor](https://www.foodvisor.io/fr/privacy-policy/raw/).

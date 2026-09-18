@@ -116,7 +116,7 @@
       "journal_separator": " à "
     },
     "export": {},
-    "export_summary": "Export terminé : {start} au {end} inclus.\n\nFoodvisor.xlsx : classeur lisible, synthèses par jour et par repas.\nFoodvisor.csv : détail des aliments, séparateur point-virgule.\nhistorique.json : données fusionnées avec les fiches alimentaires.\nSources : {source}\n\nLes quantités et nutriments sont calculés à partir des données Foodvisor.\nLes champs absents restent vides ; consulter l’onglet À lire.\n"
+    "export_summary": "Export terminé : {start} au {end} inclus.\n\nFoodvisor.xlsx : synthèses et détails des repas et activités.\nFoodvisor.csv : détail des aliments.\nFoodvisor-activities.csv : détail des activités.\nFoodvisor-activities.json : activités et totaux quotidiens.\nFoodvisor-days.csv : synthèse quotidienne.\nhistorique.json : données fusionnées du journal.\nSources : {source}\n\nLes champs absents restent vides ; consulter l’onglet À lire.\n"
   },
   "en": {
     "ui": {
@@ -310,6 +310,21 @@
       "Eau": "Water",
       "Précision": "Precision",
       "Source": "Source",
+      "Date et heure": "Date and time",
+      "Activité": "Activity",
+      "Activités": "Activities",
+      "Durée": "Duration",
+      "Calories dépensées (kcal)": "Calories burned (kcal)",
+      "Mode d’ajout": "Entry method",
+      "Ajout manuel": "Manual entry",
+      "Synchronisation": "Sync",
+      "Fournisseur de synchronisation": "Sync provider",
+      "Type d’activité": "Activity type",
+      "Référence activité": "Activity reference",
+      "Référence activité personnalisée": "Custom activity reference",
+      "Identifiant activité": "Activity ID",
+      "Activités enregistrées": "Activities recorded",
+      "Le total quotidien additionne les calories_burned des activités de ce jour. Il reste vide si une activité n’a pas de valeur valide. Le mode d’ajout est déduit du type ; source, fournisseur et durée sont conservés tels que fournis par Foodvisor.": "The daily total sums calories_burned for that day's activities. It is blank if an activity has no valid value. Entry method is inferred from the type; source, provider and duration are kept as provided by Foodvisor.",
       "Du {start} au {end} inclus. {meals} repas ; {foods} fiches alimentaires.": "From {start} through {end}, inclusive. {meals} meals; {foods} food records.",
       "Par jour : synthèse. Par repas : totaux. Aliments : lignes détaillées filtrables. Eau : volumes enregistrés.": "By day: summary. By meal: totals. Foods: filterable details. Water: recorded volumes.",
       "Masse = main_food.quantity × serving_amount × multiplicateurs des plats parents, conformément au calcul nutritionnel de l’application.": "Mass = main_food.quantity × serving_amount × parent dish multipliers, following the application’s nutrition calculation.",
@@ -328,6 +343,6 @@
       "Aliments": "Foods",
       "À lire": "Read me"
     },
-    "export_summary": "Export complete: {start} through {end}, inclusive.\n\nFoodvisor.xlsx: workbook with daily and meal summaries.\nFoodvisor.csv: food details, semicolon separated.\nhistorique.json: merged data and food records.\nSource: {source}\n\nQuantities and nutrients are calculated from Foodvisor data.\nMissing fields remain blank; see the Read me sheet.\n"
+    "export_summary": "Export complete: {start} through {end}, inclusive.\n\nFoodvisor.xlsx: meal and activity summaries and details.\nFoodvisor.csv: food details.\nFoodvisor-activities.csv: activity details.\nFoodvisor-activities.json: activities and daily totals.\nFoodvisor-days.csv: daily summary.\nhistorique.json: merged journal data.\nSource: {source}\n\nMissing fields remain blank; see the Read me sheet.\n"
   }
 }

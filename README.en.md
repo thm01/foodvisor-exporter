@@ -27,7 +27,7 @@ The source version has no additional required dependencies. To save your passwor
 
 The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
 
-Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `sources/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
+Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `sources/`. Activities also appear in `Foodvisor-activities.csv` and `.json`; their daily totals appear in `Foodvisor-days.csv` and the workbook. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor.
 
 **Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
 
@@ -57,5 +57,6 @@ Older `donnees-brutes/` folders still work with `--source` or offline conversion
 The exporter reads the authenticated account's diary and the food records referenced by that diary. It does not browse the general catalog, change the account, or perform synchronization. Requests run sequentially with a one-second pause between them; this does not guarantee that Foodvisor will accept them.
 
 The API may change, and results may be incomplete if the diary has not synchronized. Meal and food names come from Foodvisor and are not translated locally. The tool does not refresh tokens, download images, or schedule automatic exports. Check the output files before relying on them.
+Daily burned kcal are the sum of `calories_burned` from received activities; this may differ from the balance shown by Foodvisor.
 
 The repository contains no APK, decompiled code, secrets extracted from the application, or account data. To request your data through official channels, see [Foodvisor's privacy policy](https://www.foodvisor.io/fr/privacy-policy/raw/).
