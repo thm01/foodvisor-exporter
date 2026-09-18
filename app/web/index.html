@@ -35,6 +35,14 @@
         </div>
         <label class="check"><input id="remember" type="checkbox"><span id="remember-label" data-i18n="remember_password"></span></label>
         <div class="actions"><button id="login" type="button" data-i18n="login">Se connecter</button><button id="logout" class="secondary" type="button" data-i18n="logout">Se déconnecter</button><button id="forget" class="quiet" type="button" data-i18n="forget_password">Oublier le mot de passe</button></div>
+        <details id="advanced-options" class="advanced-options">
+          <summary><span data-i18n="advanced_options">Options avancées</span><small id="options-summary"></small></summary>
+          <p class="field-help" data-i18n="advanced_help">Ces réglages influencent les données demandées à Foodvisor et les fichiers exportés.</p>
+          <div class="fields two">
+            <div class="country-field"><label for="country-choice"><span data-i18n="country">Pays</span></label><select id="country-choice" aria-describedby="country-help"></select><input id="country" type="text" maxlength="2" autocomplete="off" aria-describedby="country-help" hidden><small id="country-help" class="field-help" data-i18n="country_help"></small></div>
+            <label><span data-i18n="data_locale">Langue des données</span><select id="data-locale" aria-describedby="data-locale-help"><option value="fr">fr</option><option value="en">en</option></select><small id="data-locale-help" class="field-help" data-i18n="data_locale_help"></small></label>
+          </div>
+        </details>
       </section>
 
       <section class="card period">
@@ -45,16 +53,8 @@
         </div>
       </section>
 
-      <section class="card options">
-        <div class="section-head"><span class="step">03</span><h2 data-i18n="foodvisor">Options Foodvisor</h2></div>
-        <div class="fields two">
-          <div class="country-field"><label for="country-choice"><span data-i18n="country">Pays</span></label><select id="country-choice" aria-describedby="country-help"></select><input id="country" type="text" maxlength="2" autocomplete="off" aria-describedby="country-help" hidden><small id="country-help" class="field-help" data-i18n="country_help"></small></div>
-          <label><span data-i18n="data_locale">Langue des données</span><select id="data-locale" aria-describedby="data-locale-help"><option value="fr">fr</option><option value="en">en</option></select><small id="data-locale-help" class="field-help" data-i18n="data_locale_help"></small></label>
-        </div>
-      </section>
-
       <section class="card destination">
-        <div class="section-head"><span class="step">04</span><h2 data-i18n="destination">Dossier de destination</h2></div>
+        <div class="section-head"><span class="step">03</span><h2 data-i18n="destination">Dossier de destination</h2></div>
         <div class="path-row"><input id="destination" type="text" autocomplete="off"><button id="browse-destination" class="secondary" type="button" data-i18n="browse">Choisir…</button></div>
         <div class="actions"><button id="export" type="button" data-i18n="run">Exporter</button><button id="cancel" class="secondary" type="button" data-i18n="cancel">Annuler</button></div>
         <div class="divider"></div>
@@ -64,7 +64,7 @@
       </section>
 
       <section class="card progress">
-        <div class="section-head"><span class="step">05</span><h2 data-i18n="progress">Progression</h2><span id="status" class="badge"></span></div>
+        <div class="section-head"><span class="step">04</span><h2 data-i18n="progress">Progression</h2><span id="status" class="badge"></span></div>
         <div id="progress-bar" class="progress-bar" hidden><span></span></div>
         <pre id="log" aria-live="polite"></pre>
         <div class="actions"><button id="open-output" class="secondary" type="button" data-i18n="open">Ouvrir le dossier</button><button id="copy-log" class="quiet" type="button" data-i18n="copy">Copier le diagnostic</button><button id="clear-log" class="quiet" type="button" data-i18n="clear">Effacer le diagnostic</button></div>

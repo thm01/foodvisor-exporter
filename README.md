@@ -20,9 +20,9 @@ La version source fonctionne sans dépendance supplémentaire. Pour mémoriser l
 
 ## Utilisation de l'interface
 
-1. Choisissez la langue de l'interface en haut de la page. Ce réglage ne modifie pas la langue des données.
-2. Saisissez l'adresse e-mail et le mot de passe de votre compte Foodvisor personnel. Le pays reprend le dernier code utilisé ou, au premier lancement, la région de l'ordinateur si elle est disponible. Choisissez un code si le champ reste vide. La langue des données (`fr` ou `en`) est modifiable ; elle détermine les réponses demandées à Foodvisor et les libellés CSV/XLSX.
-3. Cliquez sur **Se connecter**. La fenêtre attend la réponse de Foodvisor et active la période et l'export seulement si un jeton d'accès a été reçu. Si la réponse contient les préférences du compte, elle renseigne automatiquement le pays alimentaire et la langue prise en charge. Vous pouvez cocher **Mémoriser le mot de passe dans le coffre système** avant de vous connecter ; cette option reste désactivée si aucun coffre compatible n'est disponible.
+1. Choisissez la langue de l'interface dans le menu en haut à droite. La langue des données la suit par défaut.
+2. Saisissez l'adresse e-mail et le mot de passe de votre compte Foodvisor personnel. Le volet **Options avancées** permet de modifier le pays détecté et la langue des données ; il s'ouvre automatiquement si aucun pays n'a été trouvé.
+3. Cliquez sur **Se connecter**. La période et l'export s'activent après la réponse de Foodvisor. Les préférences du compte peuvent renseigner le pays et la langue des données, sauf si vous avez choisi cette dernière manuellement. Le coffre système peut mémoriser le mot de passe s'il est disponible.
 4. Choisissez la période au format **JJ-MM-AAAA** ou avec les calendriers, puis le dossier de destination. Vous pouvez saisir son chemin ou le choisir dans l'explorateur de dossiers de la page. Lancez ensuite l'export. La page affiche la progression et les erreurs. **Annuler** arrête le traitement entre deux requêtes ; une requête déjà en cours peut prendre jusqu'à 30 secondes.
 
 Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un code ISO à deux lettres. Foodvisor peut refuser certains codes.

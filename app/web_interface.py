@@ -88,7 +88,8 @@ class WebApplication:
         self.remember = bool(config.get('remember_password')) and self.keyring_available
         self.saved_country = saved_country(config)
         self.country = default_country(config)
-        self.data_locale = 'fr'
+        self.data_locale_manual = config.get('data_locale') in ('fr', 'en')
+        self.data_locale = config['data_locale'] if self.data_locale_manual else self.language
         self.destination = str(Path.home() / 'Foodvisor-exports')
         self.session = None
         self.busy = False
@@ -110,6 +111,8 @@ class WebApplication:
     def _save(self):
         value = {'ui_language': self.language, 'email': self.email,
                  'remember_password': self.remember}
+        if self.data_locale_manual:
+            value['data_locale'] = self.data_locale
         if self.saved_country:
             value['country'] = self.saved_country
         if self.remembered_email:
@@ -153,6 +156,10 @@ class WebApplication:
             if language not in TEXT:
                 raise ValueError('Unsupported interface language')
             self.language = language
+            if not self.data_locale_manual and 'data_locale' not in payload:
+                self.data_locale = language
+                if self.session and self.session.authenticated and not self.busy:
+                    self.session.set_options(self.country, self.data_locale)
             if 'email' in payload and not self.session and not self.authenticating:
                 self.email = str(payload['email']).strip()
             if 'destination' in payload:
@@ -165,6 +172,8 @@ class WebApplication:
                     require_country=bool(self.session and self.session.authenticated))
                 changed = (country, data_locale) != (self.country, self.data_locale)
                 self.country, self.data_locale = country, data_locale
+                if 'data_locale' in payload:
+                    self.data_locale_manual = True
                 if changed and self.session and self.session.authenticated and not self.busy:
                     self.session.set_options(country, data_locale)
                     self.saved_country = country
@@ -213,7 +222,7 @@ class WebApplication:
             with self.lock:
                 self.session = session
                 self.country = session.preferred_country or country
-                self.data_locale = session.preferred_locale or data_locale
+                self.data_locale = data_locale if self.data_locale_manual else session.preferred_locale or data_locale
                 self.session.set_options(self.country, self.data_locale)
                 self.saved_country = self.country
                 self.remembered_email, self.remember = saved_mail, remember

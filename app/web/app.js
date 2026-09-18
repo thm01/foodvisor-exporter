@@ -69,14 +69,22 @@
       $('start').value = state.start;
       $('end').value = state.end;
       syncPicker('start'); syncPicker('end');
+      if (!state.country) $('advanced-options').open = true;
     } else if (!wasConnected && state.connected) {
       setCountry(state.country);
       $('data-locale').value = state.data_locale;
       $('password').value = '';
     }
     $('language').value = state.language;
+    $('data-locale').value = state.data_locale;
     $('remember').checked = state.remember;
     translate();
+    const countryName = state.country
+      ? `${catalog[state.language].country_names[state.country] || state.country} (${state.country})`
+      : t('country_choose');
+    const localeName = t(state.data_locale === 'fr' ? 'language_french' : 'language_english');
+    $('options-summary').textContent = t('options_summary')
+      .replace('{country}', countryName).replace('{locale}', localeName);
     const busy = state.busy || state.authenticating;
     $('account-status').textContent = t(state.authenticating ? 'connecting' : state.connected ? 'connected' : 'disconnected');
     $('status').textContent = state.error ? `${t('error')}: ${state.error}` : t(state.status);
@@ -120,6 +128,7 @@
       scheduleRefresh();
     } catch (error) {
       notice(error.message);
+      if (path === '/api/login' && !countryValue()) $('advanced-options').open = true;
     }
   }
   function scheduleRefresh() {

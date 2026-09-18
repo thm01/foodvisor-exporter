@@ -20,9 +20,9 @@ The source version has no additional required dependencies. To save your passwor
 
 ## Using the graphical interface
 
-1. Choose the interface language at the top of the page. This setting does not change the language of exported data.
-2. Enter the email address and password for your personal Foodvisor account. The country uses the last code you used or, on first launch, your computer's region if available. Choose a code if the field is empty. You can change the data language (`fr` or `en`); it determines the responses requested from Foodvisor and the CSV/XLSX labels.
-3. Click **Log in**. The window waits for Foodvisor's response and enables the date range and export only after it receives an access token. If the response contains your account preferences, it automatically fills in the country and supported language. Before logging in, you can select **Remember password in the system credential store**; this option is disabled if no compatible credential store is available.
+1. Choose the interface language from the menu at the top right. The data language follows it by default.
+2. Enter the email address and password for your personal Foodvisor account. **Advanced options** lets you change the detected country and data language; it opens automatically if no country was found.
+3. Click **Log in**. The date range and export become available after Foodvisor responds. Account preferences may fill in the country and data language unless you selected the latter manually. The system credential store can remember your password when available.
 4. Choose the date range in **DD-MM-YYYY** format or with the calendars, then choose the destination directory. You can enter its path or select it in the page's folder browser. Start the export. The page shows progress and errors. **Cancel** stops processing between requests; a request already in progress can take up to 30 seconds.
 
 The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
