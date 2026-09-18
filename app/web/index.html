@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foodvisor Exporter</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">FOODVISOR EXPORTER</span>
+        <h1 data-i18n="title">Foodvisor Exporter</h1>
+      </div>
+      <div class="top-actions">
+        <label for="language" data-i18n="ui_language">Langue de l'interface</label>
+        <select id="language"><option value="fr">Français</option><option value="en">English</option></select>
+        <button id="quit" class="quiet" type="button" data-i18n="menu_quit">Quitter</button>
+      </div>
+    </header>
+
+    <p class="note" data-i18n="local_web_note"></p>
+    <div id="notice" class="notice" role="alert" hidden></div>
+
+    <main class="grid">
+      <section class="card account">
+        <div class="section-head"><span class="step">01</span><h2 data-i18n="account">Compte</h2><span id="account-status" class="badge"></span></div>
+        <div class="fields two">
+          <label><span data-i18n="email">Adresse e-mail</span><input id="email" type="email" autocomplete="username"></label>
+          <label><span data-i18n="password">Mot de passe</span><input id="password" type="password" autocomplete="off"></label>
+        </div>
+        <label class="check"><input id="remember" type="checkbox"><span id="remember-label" data-i18n="remember_password"></span></label>
+        <div class="actions"><button id="login" type="button" data-i18n="login">Se connecter</button><button id="logout" class="secondary" type="button" data-i18n="logout">Se déconnecter</button><button id="forget" class="quiet" type="button" data-i18n="forget_password">Oublier le mot de passe</button></div>
+      </section>
+
+      <section class="card period">
+        <div class="section-head"><span class="step">02</span><h2 data-i18n="period">Période</h2></div>
+        <div class="fields two">
+          <label><span data-i18n="start">Début (JJ-MM-AAAA)</span><div class="date-pair"><input id="start" type="text" inputmode="numeric" placeholder="JJ-MM-AAAA" maxlength="10"><input id="start-picker" type="date" aria-label="Choisir une date de début"></div></label>
+          <label><span data-i18n="end">Fin (JJ-MM-AAAA)</span><div class="date-pair"><input id="end" type="text" inputmode="numeric" placeholder="JJ-MM-AAAA" maxlength="10"><input id="end-picker" type="date" aria-label="Choisir une date de fin"></div></label>
+        </div>
+      </section>
+
+      <section class="card options">
+        <div class="section-head"><span class="step">03</span><h2 data-i18n="foodvisor">Options Foodvisor</h2></div>
+        <div class="fields two">
+          <label><span data-i18n="country">Pays (code ISO)</span><input id="country" type="text" maxlength="2" list="countries" autocomplete="off"><datalist id="countries"></datalist></label>
+          <label><span data-i18n="data_locale">Langue des données</span><select id="data-locale"><option value="fr">fr</option><option value="en">en</option></select></label>
+        </div>
+      </section>
+
+      <section class="card destination">
+        <div class="section-head"><span class="step">04</span><h2 data-i18n="destination">Dossier de destination</h2></div>
+        <div class="path-row"><input id="destination" type="text" autocomplete="off"><button id="browse-destination" class="secondary" type="button" data-i18n="browse">Choisir…</button></div>
+        <div class="actions"><button id="export" type="button" data-i18n="run">Exporter</button><button id="cancel" class="secondary" type="button" data-i18n="cancel">Annuler</button></div>
+        <div class="divider"></div>
+        <label for="source" data-i18n="source_path">Dossier des données brutes</label>
+        <div class="path-row"><input id="source" type="text" autocomplete="off"><button id="browse-source" class="secondary" type="button" data-i18n="browse">Choisir…</button></div>
+        <button id="convert" class="quiet convert" type="button" data-i18n="offline">Convertir des données déjà téléchargées…</button>
+      </section>
+
+      <section class="card progress">
+        <div class="section-head"><span class="step">05</span><h2 data-i18n="progress">Progression</h2><span id="status" class="badge"></span></div>
+        <div id="progress-bar" class="progress-bar" hidden><span></span></div>
+        <pre id="log" aria-live="polite"></pre>
+        <div class="actions"><button id="open-output" class="secondary" type="button" data-i18n="open">Ouvrir le dossier</button><button id="copy-log" class="quiet" type="button" data-i18n="copy">Copier le diagnostic</button><button id="clear-log" class="quiet" type="button" data-i18n="clear">Effacer le diagnostic</button></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="folder-dialog">
+    <div class="dialog-head"><h2 id="folder-title"></h2><button id="close-dialog" class="quiet" type="button" data-i18n="close">Fermer</button></div>
+    <div class="path-row"><input id="folder-path" type="text" autocomplete="off"><button id="go-folder" class="secondary" type="button">→</button></div>
+    <button id="parent-folder" class="quiet" type="button" data-i18n="parent_folder">Dossier parent</button>
+    <div id="folder-list" class="folder-list"></div>
+    <div class="dialog-actions"><button id="choose-folder" type="button" data-i18n="choose_folder">Choisir ce dossier</button></div>
+  </dialog>
+</body>
+</html>

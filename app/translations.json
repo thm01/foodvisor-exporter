@@ -33,7 +33,6 @@
       "copy": "Copier le diagnostic",
       "source": "Choisir un dossier de données brutes",
       "source_missing": "Ce dossier ne contient pas de manifest.json et termine.json.",
-      "missing_tk": "Tkinter manque dans cette installation Python. Installez le paquet python3-tk ou utilisez la ligne de commande.",
       "calendar_title": "Choisir une date",
       "today": "Aujourd’hui",
       "months": [
@@ -86,7 +85,15 @@
       "store_delete_failed": "Impossible de supprimer le mot de passe du coffre système.",
       "forget_password": "Oublier le mot de passe",
       "options_detected": "Préférences Foodvisor détectées : pays {country}, langue {locale}.",
-      "options_applied": "Réglages appliqués au prochain export : {country}/{locale}."
+      "options_applied": "Réglages appliqués au prochain export : {country}/{locale}.",
+      "source_path": "Dossier des données brutes",
+      "choose_folder": "Choisir ce dossier",
+      "parent_folder": "Dossier parent",
+      "close": "Fermer",
+      "local_web_note": "Cette page et le programme Python fonctionnent uniquement sur cet ordinateur.",
+      "server_stopped": "L'application locale ne répond plus. Relancez-la depuis le dossier du projet.",
+      "quit_confirm": "Quitter l'application et arrêter le serveur local ?",
+      "folder_empty": "Aucun sous-dossier visible."
     },
     "diagnostic_replacements": {},
     "diagnostic_meta": {
@@ -130,7 +137,6 @@
       "copy": "Copy diagnostic",
       "source": "Choose a raw data folder",
       "source_missing": "This folder does not contain manifest.json and termine.json.",
-      "missing_tk": "Tkinter is missing from this Python installation. Install the Tk package or use the command line.",
       "calendar_title": "Choose a date",
       "today": "Today",
       "months": [
@@ -183,7 +189,15 @@
       "store_delete_failed": "Could not remove the password from the system credential store.",
       "forget_password": "Forget saved password",
       "options_detected": "Foodvisor preferences detected: country {country}, language {locale}.",
-      "options_applied": "Settings for the next export: {country}/{locale}."
+      "options_applied": "Settings for the next export: {country}/{locale}.",
+      "source_path": "Raw data folder",
+      "choose_folder": "Choose this folder",
+      "parent_folder": "Parent folder",
+      "close": "Close",
+      "local_web_note": "This page and the Python program run only on this computer.",
+      "server_stopped": "The local application is no longer responding. Start it again from the project folder.",
+      "quit_confirm": "Quit the application and stop the local server?",
+      "folder_empty": "No visible subfolders."
     },
     "diagnostic_replacements": {
       "Période :": "Date range:",

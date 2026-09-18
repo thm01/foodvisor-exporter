@@ -6,7 +6,7 @@ Foodvisor Exporter permet d'exporter les données du journal de son propre compt
 
 ## Installation et lancement
 
-Téléchargez le dépôt, extrayez-le, puis installez **Python 3.9 ou plus récent avec Tkinter**. Les lanceurs vérifient ces prérequis et affichent une erreur s'ils manquent ; ils ne les installent pas.
+Téléchargez le dépôt, extrayez-le, puis installez **Python 3.9 ou plus récent**. Les lanceurs vérifient ce prérequis et affichent une erreur s'il manque ; ils ne l'installent pas. Un navigateur web récent est nécessaire.
 
 | Système | Fichier à ouvrir |
 | --- | --- |
@@ -14,16 +14,16 @@ Téléchargez le dépôt, extrayez-le, puis installez **Python 3.9 ou plus réce
 | macOS | `Foodvisor-exporter-macos.command` |
 | Linux | `Foodvisor-exporter-linux.sh` |
 
-Si le gestionnaire de fichiers n'exécute pas le lanceur Linux, ouvrez un terminal dans le dossier du projet et lancez `bash Foodvisor-exporter-linux.sh`. Sur macOS, le fichier `.command` s'ouvre dans Terminal. On peut aussi démarrer l'interface directement avec `python3 app/interface.py` (ou `py -3 app\interface.py` sous Windows).
+Si le gestionnaire de fichiers n'exécute pas le lanceur Linux, ouvrez un terminal dans le dossier du projet et lancez `bash Foodvisor-exporter-linux.sh`. Sur macOS, le fichier `.command` s'ouvre dans Terminal. On peut aussi démarrer l'interface directement avec `python3 app/web_interface.py` (ou `py -3 app\web_interface.py` sous Windows). Le programme ouvre automatiquement une page dans le navigateur ; si cela échoue, copiez l'adresse locale affichée dans le terminal.
 
-Sur certaines distributions Linux, Tkinter s'installe séparément, souvent avec le paquet `python3-tk`. L'application fonctionne sans autre bibliothèque Python. Pour activer l'option facultative de mémorisation du mot de passe dans le coffre du système, installez `keyring` avec `python3 -m pip install keyring` (ou `py -3 -m pip install keyring` sous Windows). Le coffre du système doit aussi être disponible ; sinon, la connexion manuelle reste possible. Les archives construites par le workflow GitHub Actions incluent `keyring`.
+L'application fonctionne sans autre bibliothèque Python. Pour activer l'option facultative de mémorisation du mot de passe dans le coffre du système, installez `keyring` avec `python3 -m pip install keyring` (ou `py -3 -m pip install keyring` sous Windows). Le coffre du système doit aussi être disponible ; sinon, la connexion manuelle reste possible. Les archives construites par le workflow GitHub Actions incluent `keyring` et Python : elles ne demandent pas d'installation séparée de Python.
 
 ## Utilisation de l'interface
 
-1. Choisissez la langue de l'interface dans **Fenêtre → Langue de l'interface**. Ce réglage ne modifie pas la langue des données.
+1. Choisissez la langue de l'interface en haut de la page. Ce réglage ne modifie pas la langue des données.
 2. Saisissez l'adresse e-mail et le mot de passe de votre compte Foodvisor personnel. Le pays et la langue des données (`fr` ou `en`) ont des valeurs initiales, modifiables si nécessaire. Cette langue détermine les réponses demandées à Foodvisor et les libellés CSV/XLSX.
 3. Cliquez sur **Se connecter**. La fenêtre attend la réponse de Foodvisor et active la période et l'export seulement si un jeton d'accès a été reçu. Si la réponse contient les préférences du compte, elle renseigne automatiquement le pays alimentaire et la langue prise en charge. Vous pouvez cocher **Mémoriser le mot de passe dans le coffre système** avant de vous connecter ; cette option reste désactivée si aucun coffre compatible n'est disponible.
-4. Choisissez la période au format **JJ-MM-AAAA** ou dans le calendrier et le dossier de destination, puis lancez l'export. La fenêtre affiche la progression et les erreurs. **Annuler** arrête le traitement entre deux requêtes ; une requête déjà en cours peut prendre jusqu'à 30 secondes.
+4. Choisissez la période au format **JJ-MM-AAAA** ou avec les calendriers, puis le dossier de destination. Vous pouvez saisir son chemin ou le choisir dans l'explorateur de dossiers de la page. Lancez ensuite l'export. La page affiche la progression et les erreurs. **Annuler** arrête le traitement entre deux requêtes ; une requête déjà en cours peut prendre jusqu'à 30 secondes.
 
 Le champ « Pays » propose les codes ISO à deux lettres `BE`, `FR`, `CH`, `LU`, `CA`, `US`, `GB`, `DE`, `ES` et `IT`. Ce sont des suggestions, pas une liste de pays officiellement confirmés par Foodvisor. Le code choisi entre dans l'URL de l'API ; un code ISO valide peut néanmoins être refusé par le service.
 
@@ -31,7 +31,7 @@ Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvi
 
 **Se déconnecter** efface le jeton en mémoire et reverrouille l'export. Le pays et la langue des données restent modifiables après connexion ; leurs changements s'appliquent au prochain export sans nouvelle connexion. Pour changer de compte, déconnectez-vous d'abord. La conversion hors ligne reste accessible sans connexion. **Oublier le mot de passe** le retire du coffre système ; décocher l'option de mémorisation a le même effet.
 
-La langue de l'interface et, après une tentative de connexion, l'adresse e-mail sont mémorisées localement. Le jeton n'est jamais enregistré sur disque. Le mot de passe n'y est enregistré que si vous activez explicitement le coffre système. Pour la connexion, l'application transmet le mot de passe directement à Foodvisor par HTTPS. Elle n'envoie pas les identifiants au créateur du projet.
+La page communique uniquement avec un serveur local lié à `127.0.0.1`. Le programme Python contacte Foodvisor ; le navigateur ne le contacte pas directement. Utilisez **Quitter** dans la page pour arrêter le serveur local. La langue de l'interface et, après une tentative de connexion, l'adresse e-mail sont mémorisées localement. Le jeton n'est jamais enregistré sur disque. L'application n'enregistre le mot de passe que si vous activez explicitement le coffre système ; votre navigateur peut proposer séparément de le mémoriser. Pour la connexion, l'application transmet le mot de passe directement à Foodvisor par HTTPS. Elle n'envoie pas les identifiants au créateur du projet.
 
 ## Ligne de commande
 
