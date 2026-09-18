@@ -45,6 +45,8 @@
   function translate() {
     document.documentElement.lang = state.language;
     document.title = t('title');
+    $('menu-toggle').setAttribute('aria-label', t('menu'));
+    $('menu-toggle').title = t('menu');
     document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = t(node.dataset.i18n); });
     $('remember-label').textContent = t(state.keyring_available ? 'remember_password' : 'remember_unavailable');
     $('country').placeholder = t('country_custom');
@@ -191,6 +193,15 @@
       });
     } catch (_) { notice('Local application unavailable. / Application locale indisponible.'); return; }
     $('language').onchange = () => settings({language: $('language').value});
+    document.addEventListener('click', event => {
+      if (!$('app-menu').contains(event.target)) $('app-menu').open = false;
+    });
+    $('app-menu').addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        $('app-menu').open = false;
+        $('menu-toggle').focus();
+      }
+    });
     $('email').onchange = () => settings({email: $('email').value});
     $('remember').onchange = () => {
       if ($('remember').checked) settings({remember: true});

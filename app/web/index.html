@@ -13,11 +13,14 @@
       <div>
         <h1 data-i18n="title">Foodvisor Exporter</h1>
       </div>
-      <div class="top-actions">
-        <label for="language" data-i18n="ui_language">Langue de l'interface</label>
-        <select id="language"><option value="fr">Français</option><option value="en">English</option></select>
-        <button id="quit" class="quiet" type="button" data-i18n="menu_quit">Quitter</button>
-      </div>
+      <details id="app-menu" class="app-menu">
+        <summary id="menu-toggle" aria-label="Menu" title="Menu">☰</summary>
+        <div class="menu-panel">
+          <label for="language" data-i18n="ui_language">Langue de l'interface</label>
+          <select id="language"><option value="fr">Français</option><option value="en">English</option></select>
+          <button id="quit" class="quiet" type="button" data-i18n="menu_quit">Quitter</button>
+        </div>
+      </details>
     </header>
 
     <p class="note" data-i18n="local_web_note"></p>

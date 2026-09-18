@@ -3,6 +3,7 @@
     "ui": {
       "title": "Exporteur Foodvisor",
       "ui_language": "Langue de l'interface",
+      "menu": "Menu",
       "account": "Compte",
       "email": "Adresse e-mail",
       "password": "Mot de passe",
@@ -113,6 +114,7 @@
     "ui": {
       "title": "Foodvisor Exporter",
       "ui_language": "Interface language",
+      "menu": "Menu",
       "account": "Account",
       "email": "Email address",
       "password": "Password",
