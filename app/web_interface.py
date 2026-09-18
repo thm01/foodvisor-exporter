@@ -449,7 +449,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_error(HTTPStatus.NOT_FOUND)
         except (OSError, ValueError) as exc:
-            self._json(400, {'error': str(exc)})
+            self._json(400, {'error': localize(str(exc), app.language)})
 
     def do_POST(self):
         if not self._allowed():
@@ -496,7 +496,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self._json(200, app.snapshot())
         except (OSError, ValueError, KeyError, RuntimeError) as exc:
-            self._json(400, {'error': str(exc)})
+            self._json(400, {'error': localize(str(exc), app.language)})
 
 
 def main():

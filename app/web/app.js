@@ -113,7 +113,9 @@
       options.headers = {'Content-Type': 'application/json', 'X-CSRF-Token': csrf};
       options.body = JSON.stringify(payload || {});
     }
-    const response = await fetch(path, options);
+    let response;
+    try { response = await fetch(path, options); }
+    catch (_) { throw new Error(t('server_stopped')); }
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || `${response.status}`);
     return body;
@@ -236,7 +238,7 @@
       country: countryValue(), data_locale: $('data-locale').value, destination: $('destination').value});
     $('cancel').onclick = () => action('/api/cancel');
     $('open-output').onclick = () => action('/api/open');
-    $('copy-log').onclick = async () => { try { await navigator.clipboard.writeText($('log').textContent); } catch (error) { notice(error.message); } };
+    $('copy-log').onclick = async () => { try { await navigator.clipboard.writeText($('log').textContent); } catch (_) { notice(t('copy_failed')); } };
     $('clear-log').onclick = () => action('/api/clear');
     $('close-dialog').onclick = () => $('folder-dialog').close();
     $('go-folder').onclick = () => listFolder($('folder-path').value);
