@@ -46,8 +46,8 @@
       <section class="card options">
         <div class="section-head"><span class="step">03</span><h2 data-i18n="foodvisor">Options Foodvisor</h2></div>
         <div class="fields two">
-          <label><span data-i18n="country">Pays (code ISO)</span><input id="country" type="text" maxlength="2" list="countries" autocomplete="off"><datalist id="countries"></datalist></label>
-          <label><span data-i18n="data_locale">Langue des données</span><select id="data-locale"><option value="fr">fr</option><option value="en">en</option></select></label>
+          <label><span data-i18n="country">Pays (code ISO)</span><input id="country" type="text" maxlength="2" list="countries" autocomplete="off" aria-describedby="country-help"><datalist id="countries"></datalist><small id="country-help" class="field-help" data-i18n="country_help"></small></label>
+          <label><span data-i18n="data_locale">Langue des données</span><select id="data-locale" aria-describedby="data-locale-help"><option value="fr">fr</option><option value="en">en</option></select><small id="data-locale-help" class="field-help" data-i18n="data_locale_help"></small></label>
         </div>
       </section>
 
