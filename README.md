@@ -27,7 +27,7 @@ La version source fonctionne sans dépendance supplémentaire. Pour mémoriser l
 
 Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un code ISO à deux lettres. Foodvisor peut refuser certains codes.
 
-Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `sources/`. Les activités figurent aussi dans `Foodvisor-activities.csv` et `.json` ; leur total quotidien apparaît dans `Foodvisor-days.csv` et le classeur. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. La conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor.
+Chaque export réussi crée un dossier horodaté : ouvrez `Foodvisor.xlsx` à sa racine pour consulter les repas, l’eau et les activités. Les CSV et JSON, dont les données fusionnées et les totaux quotidiens, sont dans `data/` ; les réponses brutes sont dans `sources/`. La conversion de données déjà téléchargées fonctionne sans connexion à Foodvisor et recopie les sources dans le nouvel export. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé.
 Les libellés des exports suivent la langue des données choisie. Une origine d'activité inconnue apparaît comme « Autre », avec sa valeur Foodvisor conservée dans une colonne distincte.
 Les activités saisies manuellement dans Foodvisor sont exportées lorsqu’elles figurent dans le journal reçu. Les activités issues de Santé Connect ou d’Apple Santé peuvent manquer : l’exporteur ne lit pas directement les données du téléphone.
 

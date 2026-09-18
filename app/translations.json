@@ -117,7 +117,7 @@
       "journal_separator": " à "
     },
     "export": {},
-    "export_summary": "Export terminé : {start} au {end} inclus.\n\nFoodvisor.xlsx : synthèses et détails des repas et activités.\nFoodvisor.csv : détail des aliments.\nFoodvisor-activities.csv : détail des activités.\nFoodvisor-activities.json : activités et totaux quotidiens.\nFoodvisor-days.csv : synthèse quotidienne.\nhistorique.json : données fusionnées du journal.\nSources : {source}\n\nLes champs absents restent vides ; consulter l’onglet À lire.\n"
+    "export_summary": "Export terminé : {start} au {end} inclus.\n\nFoodvisor.xlsx : synthèses et détails des repas et activités.\ndata/Foodvisor.csv : détail des aliments.\ndata/Foodvisor-activities.csv : détail des activités.\ndata/Foodvisor-activities.json : activités et totaux quotidiens.\ndata/Foodvisor-days.csv : synthèse quotidienne.\ndata/historique.json : données fusionnées du journal.\nSources : {source}\n\nLes champs absents restent vides ; consulter l’onglet À lire.\n"
   },
   "en": {
     "ui": {
@@ -350,6 +350,6 @@
       "Aliments": "Foods",
       "À lire": "Read me"
     },
-    "export_summary": "Export complete: {start} through {end}, inclusive.\n\nFoodvisor.xlsx: meal and activity summaries and details.\nFoodvisor.csv: food details.\nFoodvisor-activities.csv: activity details.\nFoodvisor-activities.json: activities and daily totals.\nFoodvisor-days.csv: daily summary.\nhistorique.json: merged journal data.\nSource: {source}\n\nMissing fields remain blank; see the Read me sheet.\n"
+    "export_summary": "Export complete: {start} through {end}, inclusive.\n\nFoodvisor.xlsx: meal and activity summaries and details.\ndata/Foodvisor.csv: food details.\ndata/Foodvisor-activities.csv: activity details.\ndata/Foodvisor-activities.json: activities and daily totals.\ndata/Foodvisor-days.csv: daily summary.\ndata/historique.json: merged journal data.\nSource: {source}\n\nMissing fields remain blank; see the Read me sheet.\n"
   }
 }

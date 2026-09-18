@@ -5,6 +5,7 @@ import datetime as dt
 import getpass
 import json
 import os
+import shutil
 from pathlib import Path
 
 from fusionner_export import merge
@@ -32,24 +33,32 @@ def run_export(start=None, end=None, country='BE', locale='fr', source=None,
         raise ValueError('La date de début doit précéder la date de fin.')
     os.umask(0o077)
     out = Path(output or ROOT / 'exports' / dt.datetime.now().strftime('%Y%m%d-%H%M%S-%f')).resolve()
+    if source and (source == out or source in out.parents):
+        raise ValueError('Le dossier de sortie ne peut pas se trouver dans le dossier source.')
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
     progress(f'Période : {start} → {end}\nDossier : {out}')
-    if not source:
+    if source:
+        saved_source = out / 'sources'
+        shutil.copytree(source, saved_source)
+        source = saved_source
+    else:
         source = out / 'sources'
         progress('1/3 — Connexion et récupération du journal.')
         export(start, end, country, locale, source, mail, password, progress, cancel, session)
     if cancel is not None and cancel.is_set():
         raise ExportCancelled('Export annulé.')
     progress('2/3 — Fusion et suppression des doublons.')
-    merged = out / 'historique.json'
+    data_dir = out / 'data'
+    data_dir.mkdir(mode=0o700)
+    merged = data_dir / 'historique.json'
     merge(source, merged)
     if cancel is not None and cancel.is_set():
         raise ExportCancelled('Export annulé.')
     progress('3/3 — Création des fichiers Excel et CSV.')
-    create(merged, out / 'Foodvisor', locale)
+    create(merged, out / 'Foodvisor', locale, data_dir=data_dir)
     summary = TRANSLATIONS[locale]['export_summary'].format(
         start=start, end=end, source=source)
-    (out / 'EXPORT_TERMINE.txt').write_text(summary, encoding='utf-8')
+    (data_dir / 'EXPORT_TERMINE.txt').write_text(summary, encoding='utf-8')
     progress(f'Tout est prêt. Classeur : {out / "Foodvisor.xlsx"}')
     return out
 

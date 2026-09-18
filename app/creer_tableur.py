@@ -140,7 +140,7 @@ def make_xlsx(path, sheets):
         for f in z.namelist(): ET.fromstring(z.read(f))
 
 
-def create(source, base, language='fr'):
+def create(source, base, language='fr', data_dir=None):
     if language not in TRANSLATIONS:
         raise ValueError(f'Unsupported export language: {language}')
     labels = TRANSLATIONS[language]['export']
@@ -211,10 +211,12 @@ def create(source, base, language='fr'):
               for name, content, widths in sheets]
     sheets[-1] = (sheets[-1][0], notes, sheets[-1][2])
     make_xlsx(base.with_suffix('.xlsx'),sheets)
-    write_csv(base.with_suffix('.csv'), headers, rows)
-    activity_csv = base.with_name(base.name + '-activities').with_suffix('.csv')
+    data_dir = Path(data_dir) if data_dir is not None else base.parent
+    food_csv = data_dir / f'{base.name}.csv'
+    write_csv(food_csv, headers, rows)
+    activity_csv = data_dir / f'{base.name}-activities.csv'
     write_csv(activity_csv, activity_headers, activities)
-    day_csv = base.with_name(base.name + '-days').with_suffix('.csv')
+    day_csv = data_dir / f'{base.name}-days.csv'
     write_csv(day_csv, sheets[0][1][0], day_rows)
     activity_keys = ('date', 'timestamp', 'name', 'duration', 'calories_burned', 'entry_method_label',
                      'origin_label', 'source', 'sync_provider', 'type', 'activity', 'custom_activity', 'local_id')
@@ -231,7 +233,7 @@ def create(source, base, language='fr'):
                'activities': normalized_activities,
                'daily_totals': [{'date': row[0], 'activity_count': row[-2], 'calories_burned': row[-1]}
                                 for row in day_rows]}
-    activity_json = base.with_name(base.name + '-activities').with_suffix('.json')
+    activity_json = data_dir / f'{base.name}-activities.json'
     with activity_json.open('x', encoding='utf-8') as stream:
         json.dump(summary, stream, ensure_ascii=False, indent=2)
         stream.write('\n')
@@ -240,10 +242,10 @@ def create(source, base, language='fr'):
         if all(r[7+i] is not None for r in rows):
             assert abs(sum(r[7+i] for r in rows)-sum(r[3+i] for r in meal_rows))<1e-6
             assert abs(sum(r[7+i] for r in rows)-sum(r[3+i] or 0 for r in day_rows))<1e-6
-    with base.with_suffix('.csv').open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.reader(f,delimiter=';')))==len(rows)+1
+    with food_csv.open(encoding='utf-8-sig',newline='') as f: assert len(list(csv.reader(f,delimiter=';')))==len(rows)+1
     with activity_csv.open(encoding='utf-8-sig', newline='') as f:
         assert len(list(csv.reader(f, delimiter=';'))) == len(activities) + 1
-    print(json.dumps({'xlsx':str(base.with_suffix('.xlsx')),'csv':str(base.with_suffix('.csv')),'lignes_aliments':len(rows),'repas':len(meal_rows),'jours':len(day_rows),'valeurs_incompletes':sum(r[12]!=tr('Complet') for r in rows)},ensure_ascii=False,indent=2))
+    print(json.dumps({'xlsx':str(base.with_suffix('.xlsx')),'csv':str(food_csv),'lignes_aliments':len(rows),'repas':len(meal_rows),'jours':len(day_rows),'valeurs_incompletes':sum(r[12]!=tr('Complet') for r in rows)},ensure_ascii=False,indent=2))
 
 
 if __name__=='__main__':

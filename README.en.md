@@ -27,7 +27,7 @@ The source version has no additional required dependencies. To save your passwor
 
 The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
 
-Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `sources/`. Activities also appear in `Foodvisor-activities.csv` and `.json`; their daily totals appear in `Foodvisor-days.csv` and the workbook. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor.
+Each successful export creates a timestamped directory: open `Foodvisor.xlsx` at its root to view meals, water, and activities. CSV and JSON files, including merged data and daily totals, are in `data/`; raw responses are in `sources/`. You can convert previously downloaded data without connecting to Foodvisor; the sources are copied into the new export. These files may contain sensitive personal data: keep them in a private location.
 Export labels follow the selected data language. An unknown activity origin appears as “Other”, with its raw Foodvisor value kept in a separate column.
 Manually entered Foodvisor activities are exported when present in the received journal. Activities from Health Connect or Apple Health may be missing: the exporter does not read phone data directly.
 
