@@ -27,7 +27,7 @@ La version source fonctionne sans dépendance supplémentaire. Pour mémoriser l
 
 Le menu « Pays » propose des pays courants et « Autre pays » pour saisir un code ISO à deux lettres. Foodvisor peut refuser certains codes.
 
-Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `donnees-brutes/`. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. L'option de conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor ; son avancement et son résultat s'affichent dans la fenêtre. Le diagnostic peut être effacé avec le bouton prévu à cet effet.
+Chaque export réussi crée un dossier horodaté avec `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt` et les réponses JSON brutes dans `sources/`. Ces fichiers peuvent contenir des données personnelles sensibles : conservez-les dans un emplacement privé. L'option de conversion des données déjà téléchargées fonctionne sans connexion à Foodvisor ; son avancement et son résultat s'affichent dans la fenêtre. Le diagnostic peut être effacé avec le bouton prévu à cet effet.
 
 **Se déconnecter** efface le jeton en mémoire et reverrouille l'export. Le pays et la langue des données restent modifiables après connexion ; leurs changements s'appliquent au prochain export sans nouvelle connexion. Pour changer de compte, déconnectez-vous d'abord. La conversion hors ligne reste accessible sans connexion. **Oublier le mot de passe** le retire du coffre système ; décocher l'option de mémorisation a le même effet.
 
@@ -46,10 +46,11 @@ Dans le terminal, les dates utilisent le format **AAAA-MM-JJ**. `--start` est re
 Pour convertir à nouveau des réponses déjà téléchargées, sans connexion :
 
 ```bash
-bash Foodvisor-exporter.sh --source exports/<horodatage>/donnees-brutes
+bash Foodvisor-exporter.sh --source exports/<horodatage>/sources
 ```
 
 Une commande normale se termine après un export. Pour en lancer plusieurs dans la même console en réutilisant la session, utilisez `bash Foodvisor-exporter.sh --interactive`. Saisissez une période au format **AAAA-MM-JJ** pour chaque export, puis laissez la date de début vide pour quitter. Le mot de passe est redemandé seulement si la session n'est plus valide. Il n'est pas conservé sur disque.
+Les anciens dossiers `donnees-brutes/` restent utilisables avec `--source` ou la conversion dans l'interface.
 
 ## Limites
 

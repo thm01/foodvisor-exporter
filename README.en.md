@@ -27,7 +27,7 @@ The source version has no additional required dependencies. To save your passwor
 
 The “Country” menu offers common countries and “Other country” for a two-letter ISO code. Foodvisor may reject some codes.
 
-Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `donnees-brutes/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
+Each successful export creates a timestamped directory containing `historique.json`, `Foodvisor.csv`, `Foodvisor.xlsx`, `EXPORT_TERMINE.txt`, and the raw JSON responses in `sources/`. These files may contain sensitive personal data: keep them in a private location. You can convert previously downloaded data without connecting to Foodvisor; the window shows its progress and result. Use the dedicated button to clear the diagnostics pane.
 
 **Log out** clears the in-memory token and locks export again. You can change the country and data language after logging in; changes apply to the next export without logging in again. To switch accounts, log out first. Offline conversion remains available while logged out. **Forget saved password** removes it from the system credential store; clearing the remember option has the same effect.
 
@@ -46,10 +46,11 @@ In the terminal, dates use **YYYY-MM-DD** format. `--start` is required for a do
 To convert previously downloaded responses again, without connecting:
 
 ```bash
-bash Foodvisor-exporter.sh --source exports/<timestamp>/donnees-brutes
+bash Foodvisor-exporter.sh --source exports/<timestamp>/sources
 ```
 
 A normal command exits after one export. To run several exports in the same terminal and reuse the session, run `bash Foodvisor-exporter.sh --interactive`. Enter a date range in **YYYY-MM-DD** format for each export, then leave the start date blank to quit. The password is requested again only if the session is no longer valid. It is not stored on disk.
+Older `donnees-brutes/` folders still work with `--source` or offline conversion in the interface.
 
 ## Limitations
 

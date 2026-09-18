@@ -35,7 +35,7 @@ def run_export(start=None, end=None, country='BE', locale='fr', source=None,
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
     progress(f'Période : {start} → {end}\nDossier : {out}')
     if not source:
-        source = out / 'donnees-brutes'
+        source = out / 'sources'
         progress('1/3 — Connexion et récupération du journal.')
         export(start, end, country, locale, source, mail, password, progress, cancel, session)
     if cancel is not None and cancel.is_set():
