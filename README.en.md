@@ -2,7 +2,9 @@
 
 English · [Français](README.md)
 
-Foodvisor Exporter retrieves the diary from your own Foodvisor account and creates a workbook you can open in Excel or LibreOffice Calc. This is an **unofficial, independent project with no affiliation to Foodvisor**. It uses a private API that may change or reject requests. Check [Foodvisor’s terms of service](https://www.foodvisor.io/fr/terms-of-service/raw/) before using it.
+Foodvisor Exporter retrieves the diary from your own [Foodvisor](https://www.foodvisor.io/) account and creates a workbook you can open in Excel or LibreOffice Calc.
+
+> **Disclaimer —** This project is unofficial and is neither endorsed by nor affiliated with Foodvisor. It uses Foodvisor’s private mobile API based on observing the application’s requests. Use it at your own risk: endpoints may change without notice or reject requests. Check [Foodvisor’s terms of service](https://www.foodvisor.io/fr/terms-of-service/raw/) before using it.
 
 ## Install and launch
 

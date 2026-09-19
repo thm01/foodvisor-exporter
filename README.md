@@ -2,7 +2,9 @@
 
 [English](README.en.md) · Français
 
-Foodvisor Exporter récupère le journal de votre propre compte Foodvisor et crée un classeur à ouvrir dans Excel ou LibreOffice Calc. Le projet est **non officiel, indépendant et non affilié à Foodvisor**. Il utilise une API privée susceptible de changer ou de refuser les requêtes. Consultez les [conditions d’utilisation de Foodvisor](https://www.foodvisor.io/fr/terms-of-service/raw/) avant de l’utiliser.
+Foodvisor Exporter récupère le journal de votre propre compte [Foodvisor](https://www.foodvisor.io/) et crée un classeur à ouvrir dans Excel ou LibreOffice Calc.
+
+> **Avertissement —** Ce projet est non officiel et n’est ni approuvé ni affilié à Foodvisor. Il utilise l’API mobile privée de Foodvisor à partir de l’observation des requêtes de l’application. Utilisez-le à vos risques : les points d’accès peuvent changer sans préavis ou refuser les requêtes. Consultez les [conditions d’utilisation de Foodvisor](https://www.foodvisor.io/fr/terms-of-service/raw/) avant de l’utiliser.
 
 ## Installer et lancer
 
