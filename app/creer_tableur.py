@@ -101,6 +101,9 @@ def column(n):
 def make_xlsx(path, sheets):
     ns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
     rel = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    def write_xml(archive, name, content):
+        archive.writestr(name, (xml_declaration + content).encode('utf-8'))
     styles = f'''<styleSheet xmlns="{ns}">
       <fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Calibri"/></font></fonts>
       <fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF235A67"/><bgColor indexed="64"/></patternFill></fill></fills>
@@ -110,13 +113,13 @@ def make_xlsx(path, sheets):
     </styleSheet>'''
     with zipfile.ZipFile(path, 'x', zipfile.ZIP_DEFLATED) as z:
         overrides = ''.join(f'<Override PartName="/xl/worksheets/sheet{i}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' for i in range(1, len(sheets)+1))
-        z.writestr('[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+overrides+'</Types>')
-        z.writestr('_rels/.rels', f'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="{rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>')
-        z.writestr('xl/styles.xml', styles)
+        write_xml(z, '[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+overrides+'</Types>')
+        write_xml(z, '_rels/.rels', f'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="{rel}/officeDocument" Target="xl/workbook.xml"/></Relationships>')
+        write_xml(z, 'xl/styles.xml', styles)
         entries = ''.join(f'<sheet name="{escape(name)}" sheetId="{i}" r:id="rId{i}"/>' for i,(name,_,_) in enumerate(sheets,1))
-        z.writestr('xl/workbook.xml', f'<workbook xmlns="{ns}" xmlns:r="{rel}"><sheets>{entries}</sheets></workbook>')
+        write_xml(z, 'xl/workbook.xml', f'<workbook xmlns="{ns}" xmlns:r="{rel}"><sheets>{entries}</sheets></workbook>')
         entries = ''.join(f'<Relationship Id="rId{i}" Type="{rel}/worksheet" Target="worksheets/sheet{i}.xml"/>' for i in range(1,len(sheets)+1))
-        z.writestr('xl/_rels/workbook.xml.rels', f'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{entries}<Relationship Id="styles" Type="{rel}/styles" Target="styles.xml"/></Relationships>')
+        write_xml(z, 'xl/_rels/workbook.xml.rels', f'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{entries}<Relationship Id="styles" Type="{rel}/styles" Target="styles.xml"/></Relationships>')
         for i,(name,rows,widths) in enumerate(sheets,1):
             last = f'{column(len(rows[0]))}{len(rows)}'
             parts = [f'<worksheet xmlns="{ns}"><dimension ref="A1:{last}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>']
@@ -134,7 +137,7 @@ def make_xlsx(path, sheets):
                         parts.append(f'<c r="{ref}" s="{1 if rn==1 else 0}" t="inlineStr"><is><t xml:space="preserve">{escape(text)}</t></is></c>')
                 parts.append('</row>')
             parts.append(f'</sheetData><autoFilter ref="A1:{last}"/></worksheet>')
-            z.writestr(f'xl/worksheets/sheet{i}.xml',''.join(parts))
+            write_xml(z, f'xl/worksheets/sheet{i}.xml', ''.join(parts))
     with zipfile.ZipFile(path) as z:
         assert z.testzip() is None
         for f in z.namelist(): ET.fromstring(z.read(f))
